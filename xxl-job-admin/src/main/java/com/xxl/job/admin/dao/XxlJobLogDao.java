@@ -13,39 +13,58 @@ import java.util.Map;
  */
 public interface XxlJobLogDao {
 	// logStatus ==1（成功）2（失败）3（进行中）
-	public List<XxlJobLog> pageList(@Param("offset") int offset,
-									@Param("pagesize") int pagesize,
-									@Param("jobGroup") int jobGroup,
-									@Param("jobId") int jobId,
-									@Param("triggerTimeStart") Date triggerTimeStart,
-									@Param("triggerTimeEnd") Date triggerTimeEnd,
-									@Param("logStatus") int logStatus);
-	public int pageListCount(@Param("offset") int offset,
+	List<XxlJobLog> pageList(@Param("offset") int offset,
 							 @Param("pagesize") int pagesize,
 							 @Param("jobGroup") int jobGroup,
 							 @Param("jobId") int jobId,
 							 @Param("triggerTimeStart") Date triggerTimeStart,
 							 @Param("triggerTimeEnd") Date triggerTimeEnd,
 							 @Param("logStatus") int logStatus);
-	
-	public XxlJobLog load(@Param("id") int id);
 
-	public int save(XxlJobLog xxlJobLog);
+	int pageListCount(@Param("offset") int offset,
+					  @Param("pagesize") int pagesize,
+					  @Param("jobGroup") int jobGroup,
+					  @Param("jobId") int jobId,
+					  @Param("triggerTimeStart") Date triggerTimeStart,
+					  @Param("triggerTimeEnd") Date triggerTimeEnd,
+					  @Param("logStatus") int logStatus);
 
-	public int updateTriggerInfo(XxlJobLog xxlJobLog);
+	// 查找记录数
+	long counts();
 
-	public int updateHandleInfo(XxlJobLog xxlJobLog);
-	
-	public int delete(@Param("jobId") int jobId);
+	// 查找所有日志
+	List<XxlJobLog> findAll(@Param("offset") int offset,
+							@Param("pagesize") int pagesize);
 
-	public int triggerCountByHandleCode(@Param("handleCode") int handleCode);
 
-	public List<Map<String, Object>> triggerCountByDay(@Param("from") Date from,
-													   @Param("to") Date to);
+	// 根据logId，获取调度备注
+	XxlJobLog getLogByLogId(@Param("logId") int logId);
 
-	public int clearLog(@Param("jobGroup") int jobGroup,
-						@Param("jobId") int jobId,
-						@Param("clearBeforeTime") Date clearBeforeTime,
-						@Param("clearBeforeNum") int clearBeforeNum);
+
+
+	// 根据日志id，加载任务的日志详细信息
+	XxlJobLog loadByLogId(@Param("id") int id);
+
+	List<XxlJobLog> loadByJobId(@Param("jobId") int jobId);
+
+	int save(XxlJobLog xxlJobLog);
+
+	int updateTriggerInfo(XxlJobLog xxlJobLog);
+
+	int updateHandleInfo(XxlJobLog xxlJobLog);
+
+	int delete(@Param("jobId") int jobId);
+
+	int triggerCountByHandleCode(@Param("handleCode") int handleCode);
+
+	List<Map<String, Object>> triggerCountByDay(@Param("from") Date from,
+												@Param("to") Date to);
+
+	int clearLog(@Param("jobGroup") int jobGroup,
+				 @Param("jobId") int jobId,
+				 @Param("clearBeforeTime") Date clearBeforeTime,
+				 @Param("clearBeforeNum") int clearBeforeNum);
+
+	XxlJobLog getCurrentLog(@Param("jobId") int jobId);
 
 }

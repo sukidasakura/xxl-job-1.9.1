@@ -54,7 +54,7 @@ public class JobFailMonitorHelper {
 									continue;
 								}
 								// 从数据库跟以前有日志信息
-								XxlJobLog log = XxlJobDynamicScheduler.xxlJobLogDao.load(jobLogId);
+								XxlJobLog log = XxlJobDynamicScheduler.xxlJobLogDao.loadByLogId(jobLogId);
 								if (log == null) {
 									continue;
 								}
@@ -90,7 +90,7 @@ public class JobFailMonitorHelper {
 				int drainToNum = getInstance().queue.drainTo(jobLogIdList);
 				if (jobLogIdList!=null && jobLogIdList.size()>0) {
 					for (Integer jobLogId: jobLogIdList) {
-						XxlJobLog log = XxlJobDynamicScheduler.xxlJobLogDao.load(jobLogId);
+						XxlJobLog log = XxlJobDynamicScheduler.xxlJobLogDao.loadByLogId(jobLogId);
 						if (ReturnT.FAIL_CODE == log.getTriggerCode()|| ReturnT.FAIL_CODE==log.getHandleCode()) {
 							// job fail,
 							failAlarm(log);

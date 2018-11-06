@@ -8,7 +8,7 @@ import java.util.Date;
  * @author: mashencai@supcon.com
  * @date: 2018年09月21日 9:00
  */
-public class DateUtil {
+public class DateTool {
 
     /**
      * 把long类型时间转化为标准时间

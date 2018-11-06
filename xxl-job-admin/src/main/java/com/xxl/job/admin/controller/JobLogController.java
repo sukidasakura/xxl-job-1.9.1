@@ -12,17 +12,15 @@ import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.biz.model.LogResult;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.glue.GlueTypeEnum;
-import com.xxl.job.core.rpc.netcom.NetComClientProxy;
-import com.xxl.job.core.util.DateUtil;
+import com.xxl.job.core.util.DateTool;
+import freemarker.core.ReturnInstruction;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
@@ -64,16 +62,72 @@ public class JobLogController {
 		return "joblog/joblog.index";
 	}
 
+	/**
+	 * 列出所有调度日志
+	 * @param
+	 * @return
+	 */
+	@RequestMapping(value = "/findAll", method = RequestMethod.POST)
+	@ResponseBody
+	public List<XxlJobLog> findAll(@RequestParam(required = false, defaultValue = "0") int start,
+								   @RequestParam(required = false, defaultValue = "10") int length){
+		return xxlJobLogDao.findAll(start, length);
+	}
+
+	/**
+	 * 获取日志的数量
+	 * @return
+	 */
+	@RequestMapping(value = "counts", method = RequestMethod.GET)
+	@ResponseBody
+	public long counts(){
+		return xxlJobLogDao.counts();
+	}
+
+
 	@RequestMapping("/getJobsByGroup")
 	@ResponseBody
 	public ReturnT<List<XxlJobInfo>> getJobsByGroup(int jobGroup){
 		List<XxlJobInfo> list = xxlJobInfoDao.getJobsByGroup(jobGroup);
 		return new ReturnT<List<XxlJobInfo>>(list);
 	}
-	
+
+	/**
+	 * 根据任务ID，加载对应的所有历史日志
+	 * @param jobId
+	 * @return
+	 */
+	@RequestMapping(value="/getLogsByJobId", method = RequestMethod.POST)
+	@ResponseBody
+	public List<XxlJobLog> getLogsById(int jobId){
+		return xxlJobLogDao.loadByJobId(jobId);
+	}
+
+	/**
+	 * 根据日志Id, 加载对应的日志信息
+	 * @param logId
+	 * @return
+	 */
+	@RequestMapping(value = "/getLogByLogId", method = RequestMethod.POST)
+	@ResponseBody
+	public XxlJobLog getLogByLogId(int logId){
+		return xxlJobLogDao.getLogByLogId(logId);
+	}
+
+
+	/**
+	 *
+	 * @param start
+	 * @param length
+	 * @param jobGroup
+	 * @param jobId
+	 * @param logStatus
+	 * @param filterTime
+	 * @return
+	 */
 	@RequestMapping("/pageList")
 	@ResponseBody
-	public Map<String, Object> pageList(@RequestParam(required = false, defaultValue = "0") int start,  
+	public Map<String, Object> pageList(@RequestParam(required = false, defaultValue = "0") int start,
 			@RequestParam(required = false, defaultValue = "10") int length,
 			int jobGroup, int jobId, int logStatus, String filterTime) {
 		
@@ -102,12 +156,13 @@ public class JobLogController {
 		return maps;
 	}
 
+
 	@RequestMapping("/logDetailPage")
 	public String logDetailPage(int id, Model model){
 
 		// base check
 		ReturnT<String> logStatue = ReturnT.SUCCESS;
-		XxlJobLog jobLog = xxlJobLogDao.load(id);
+		XxlJobLog jobLog = xxlJobLogDao.loadByLogId(id);
 		if (jobLog == null) {
             throw new RuntimeException(I18nUtil.getString("joblog_logid_unvalid"));
 		}
@@ -120,6 +175,31 @@ public class JobLogController {
 		return "joblog/joblog.detail";
 	}
 
+
+	// 任务运行的日志(用于data_center)
+	@RequestMapping(value = "/runningLog", method = RequestMethod.POST)
+	@ResponseBody
+	public ReturnT<LogResult> logDetailCat(int jobId, int fromLineNum) {
+		//  触发任务后，数据库的日志中就会多出最新的一条日志信息。根据job id来找到该jobId对应的最新的一条日志
+		XxlJobLog log = xxlJobLogDao.getCurrentLog(jobId);
+		String executorAddress = log.getExecutorAddress();
+		String triggerTime = log.getTriggerTime();
+		int logId = log.getId();
+
+		return logDetailCat(executorAddress, triggerTime, logId, fromLineNum);
+	}
+
+
+
+	/**
+	 * 任务运行的日志(用于xxl-job本身的页面)
+	 * 根据历史日志的过滤条件，查看任务的某一次历史日志内容
+	 * @param executorAddress
+	 * @param triggerTime
+	 * @param logId
+	 * @param fromLineNum
+	 * @return
+	 */
 	@RequestMapping("/logDetailCat")
 	@ResponseBody
 	public ReturnT<LogResult> logDetailCat(String executorAddress, String triggerTime, int logId, int fromLineNum){
@@ -129,7 +209,7 @@ public class JobLogController {
 
 			// is end
             if (logResult.getContent()!=null && logResult.getContent().getFromLineNum() > logResult.getContent().getToLineNum()) {
-                XxlJobLog jobLog = xxlJobLogDao.load(logId);
+                XxlJobLog jobLog = xxlJobLogDao.loadByLogId(logId);
                 if (jobLog.getHandleCode() > 0) {
                     logResult.getContent().setEnd(true);
                 }
@@ -147,7 +227,7 @@ public class JobLogController {
 	@ResponseBody
 	public ReturnT<String> logKill(int id){
 		// base check 从数据库中获取该日志信息
-		XxlJobLog log = xxlJobLogDao.load(id);
+		XxlJobLog log = xxlJobLogDao.loadByLogId(id);
 		// 获取该任务的信息
 		XxlJobInfo jobInfo = xxlJobInfoDao.loadById(log.getJobId());
 		if (jobInfo==null) {
@@ -174,7 +254,7 @@ public class JobLogController {
 		if (ReturnT.SUCCESS_CODE == runResult.getCode()) {
 			log.setHandleCode(ReturnT.FAIL_CODE);
 			log.setHandleMsg( I18nUtil.getString("joblog_kill_log_byman")+":" + (runResult.getMsg()!=null?runResult.getMsg():""));
-			log.setHandleTime(DateUtil.convertDateTime(new Date()));
+			log.setHandleTime(DateTool.convertDateTime(new Date()));
 			xxlJobLogDao.updateHandleInfo(log);
 			return new ReturnT<String>(runResult.getMsg());
 		} else {

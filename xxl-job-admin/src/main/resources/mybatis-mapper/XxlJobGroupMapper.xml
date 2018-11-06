@@ -21,17 +21,65 @@
 		t.address_list
 	</sql>
 
+	<select id="counts" resultType="java.lang.Long">
+		SELECT COUNT(*)
+		FROM XXL_JOB_QRTZ_TRIGGER_GROUP
+	</select>
+
 	<select id="findAll" resultMap="XxlJobGroup">
 		SELECT <include refid="Base_Column_List" />
 		FROM XXL_JOB_QRTZ_TRIGGER_GROUP AS t
 		ORDER BY t.order ASC
 	</select>
 
+	<select id="findAllByPage" resultMap="XxlJobGroup">
+		SELECT <include refid="Base_Column_List" />
+		FROM XXL_JOB_QRTZ_TRIGGER_GROUP AS t
+		ORDER BY t.order ASC
+		LIMIT #{offset}, #{pagesize}
+	</select>
+
+
+	<select id="pageList" parameterType="java.util.HashMap" resultMap="XxlJobGroup">
+		SELECT <include refid="Base_Column_List" />
+		FROM XXL_JOB_QRTZ_TRIGGER_GROUP AS t
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="appName != null and appName != ''">
+				AND t.app_name like CONCAT(CONCAT('%', #{appName}), '%')
+			</if>
+			<if test="addressType ==1 || addressType ==0">
+				AND t.address_type = #{addressType}
+			</if>
+		</trim>
+		ORDER BY id DESC
+		LIMIT #{offset}, #{pagesize}
+	</select>
+
+	<select id="pageListCount" parameterType="java.util.HashMap" resultType="int">
+		SELECT count(1)
+		FROM XXL_JOB_QRTZ_TRIGGER_GROUP AS t
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="appName != null and appName != ''">
+				AND t.app_name like CONCAT(CONCAT('%', #{appName}), '%')
+			</if>
+			<if test="addressType ==1 || addressType ==0">
+				AND t.address_type = #{addressType}
+			</if>
+		</trim>
+	</select>
+
+
 	<select id="findByAddressType" parameterType="java.lang.Integer" resultMap="XxlJobGroup">
 		SELECT <include refid="Base_Column_List" /><!--定义唯一id Base_Column_List后，通过引用重用。会自动把上面的代码贴过来。-->
 		FROM XXL_JOB_QRTZ_TRIGGER_GROUP AS t
 		WHERE t.address_type = #{addressType}
 		ORDER BY t.order ASC
+	</select>
+
+	<select id="loadById" parameterType="java.util.HashMap" resultMap="XxlJobGroup">
+		SELECT <include refid="Base_Column_List" />
+		FROM XXL_JOB_QRTZ_TRIGGER_GROUP AS t
+		WHERE t.id = #{id}
 	</select>
 
 	<insert id="save" parameterType="com.xxl.job.admin.core.model.XxlJobGroup" useGeneratedKeys="true" keyProperty="id" >

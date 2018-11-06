@@ -14,45 +14,12 @@ import java.util.Map;
  */
 public interface XxlJobLogGlueDao {
 
-	List<XxlJobLog> pageList(@Param("offset") int offset,
-							 @Param("pagesize") int pagesize,
-							 @Param("jobGroup") int jobGroup,
-							 @Param("jobId") int jobId,
-							 @Param("triggerTimeStart") Date triggerTimeStart,
-							 @Param("triggerTimeEnd") Date triggerTimeEnd,
-							 @Param("logStatus") int logStatus);
+	public int save(XxlJobLogGlue xxlJobLogGlue);
 
-	int pageListCount(@Param("offset") int offset,
-					  @Param("pagesize") int pagesize,
-					  @Param("jobGroup") int jobGroup,
-					  @Param("jobId") int jobId,
-					  @Param("triggerTimeStart") Date triggerTimeStart,
-					  @Param("triggerTimeEnd") Date triggerTimeEnd,
-					  @Param("logStatus") int logStatus);
+	public List<XxlJobLogGlue> findByJobId(@Param("jobId") int jobId);
 
-	// 根据日志id，加载任务的日志详细信息
-	XxlJobLog loadByLogId(@Param("id") int id);
+	public int removeOld(@Param("jobId") int jobId, @Param("limit") int limit);
 
-	List<XxlJobLog> loadByJobId(@Param("jobId") int jobId);
-
-	int save(XxlJobLog xxlJobLog);
-
-	int updateTriggerInfo(XxlJobLog xxlJobLog);
-
-	int updateHandleInfo(XxlJobLog xxlJobLog);
-
-	int delete(@Param("jobId") int jobId);
-
-	int triggerCountByHandleCode(@Param("handleCode") int handleCode);
-
-	List<Map<String, Object>> triggerCountByDay(@Param("from") Date from,
-												@Param("to") Date to);
-
-	int clearLog(@Param("jobGroup") int jobGroup,
-				 @Param("jobId") int jobId,
-				 @Param("clearBeforeTime") Date clearBeforeTime,
-				 @Param("clearBeforeNum") int clearBeforeNum);
-
-	XxlJobLog getCurrentLog(@Param("jobId") int jobId);
+	public int deleteByJobId(@Param("jobId") int jobId);
 
 }

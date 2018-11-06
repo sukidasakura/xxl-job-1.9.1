@@ -40,7 +40,7 @@
 
     <insert id="registrySave" >
         INSERT INTO XXL_JOB_QRTZ_TRIGGER_REGISTRY( `registry_group` , `registry_key` , `registry_value`, `update_time`)
-        VALUES( #{registryGroup}  , #{registryKey} , #{registryValue}, NOW())
+        VALUES( #{registryGroup}  , #{registryKey} , #{registryValue},  #{updateTime})
     </insert>
 
 	<delete id="registryDelete" >

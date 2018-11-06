@@ -1,9 +1,11 @@
 package com.xxl.job.admin.core.trigger;
 
+import com.alibaba.fastjson.JSON;
 import com.xxl.job.admin.core.enums.ExecutorFailStrategyEnum;
 import com.xxl.job.admin.core.model.XxlJobGroup;
 import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.admin.core.model.XxlJobLog;
+import com.xxl.job.admin.core.model.XxlJobResource;
 import com.xxl.job.admin.core.route.ExecutorRouteStrategyEnum;
 import com.xxl.job.admin.core.schedule.XxlJobDynamicScheduler;
 import com.xxl.job.admin.core.thread.JobFailMonitorHelper;
@@ -12,14 +14,17 @@ import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.biz.model.TriggerParam;
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
-import com.xxl.job.core.util.DateUtil;
+import com.xxl.job.core.util.DateTool;
 import com.xxl.job.core.util.IpUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * xxl-job trigger
@@ -48,7 +53,6 @@ public class XxlJobTrigger {
         }
         // 获取该类型的执行器信息
         XxlJobGroup group = XxlJobDynamicScheduler.xxlJobGroupDao.load(jobInfo.getJobGroup());  // group info
-
         // 运行匹配模式
         ExecutorBlockStrategyEnum blockStrategy = ExecutorBlockStrategyEnum.match(jobInfo.getExecutorBlockStrategy(), ExecutorBlockStrategyEnum.SERIAL_EXECUTION);  // block strategy
         // 匹配失败后的处理模式
@@ -76,7 +80,7 @@ public class XxlJobTrigger {
                 jobLog.setGlueType(jobInfo.getGlueType());
                 jobLog.setExecutorHandler(jobInfo.getExecutorHandler());
                 jobLog.setExecutorParam(jobInfo.getExecutorParam());
-                jobLog.setTriggerTime(DateUtil.convertDateTime(new Date()));
+                jobLog.setTriggerTime(DateTool.convertDateTime(new Date()));
 
                 ReturnT<String> triggerResult = new ReturnT<String>(null);
                 // triggerMsgSb：调度日志页面中的“调度备注”
@@ -106,11 +110,27 @@ public class XxlJobTrigger {
                     triggerParam.setLogDateTim(jobLog.getTriggerTime());
                     triggerParam.setGlueType(jobInfo.getGlueType());
                     triggerParam.setGlueSource(jobInfo.getGlueSource());
-                    triggerParam.setGlueUpdatetime(jobInfo.getGlueUpdatetime());
+                    triggerParam.setGlueUpdatetime(jobInfo.getGlueUpdateTime());
                     triggerParam.setBroadcastIndex(i); //设置分片标记
                     triggerParam.setBroadcastTotal(addressList.size()); // update02 设计分片总数
 
-
+                    // 设置资源名和资源内容
+                    if (jobInfo.getResourceId() != null) {
+                        Map<String, byte[]> map = new HashMap<>();
+                        String[] resourceIds = StringUtils.split(jobInfo.getResourceId(), ",");
+                        for (String resourceIdItem : resourceIds) {
+                            if (StringUtils.isNotBlank(resourceIdItem) && StringUtils.isNumeric(resourceIdItem)) {
+                                XxlJobResource xxlJobResource = XxlJobDynamicScheduler.xxlJobResourceDao.loadById(Integer.valueOf(resourceIdItem));
+                                map.put(xxlJobResource.getFileName(), xxlJobResource.getContent());
+                            }
+                        }
+                        //
+                        triggerParam.setResources(map);
+                    }
+                    // 设置自定义参数
+                    if (jobInfo.getCustomParam() != null){
+                        triggerParam.setCustomParam(jobInfo.getCustomParam());
+                    }
 
                     // 4.2、trigger-run (route run / trigger remote executor)
                     // 根据参数以及机器地址，向执行器发送执行信息，需要详细了解runExecutor这个方法
@@ -151,9 +171,10 @@ public class XxlJobTrigger {
             jobLog.setGlueType(jobInfo.getGlueType());
             jobLog.setExecutorHandler(jobInfo.getExecutorHandler());
             jobLog.setExecutorParam(jobInfo.getExecutorParam());
-            jobLog.setTriggerTime(DateUtil.convertDateTime(new Date()));
+            jobLog.setTriggerTime(DateTool.convertDateTime(new Date()));
 
             ReturnT<String> triggerResult = new ReturnT<String>(null);
+            // triggerMsgSb：调度日志页面中的“调度备注”
             StringBuffer triggerMsgSb = new StringBuffer();
             triggerMsgSb.append(I18nUtil.getString("jobconf_trigger_admin_adress")).append("：").append(IpUtil.getIp());
             triggerMsgSb.append("<br>").append(I18nUtil.getString("jobconf_trigger_exe_regtype")).append("：")
@@ -180,23 +201,41 @@ public class XxlJobTrigger {
                 triggerParam.setLogDateTim(jobLog.getTriggerTime());
                 triggerParam.setGlueType(jobInfo.getGlueType());
                 triggerParam.setGlueSource(jobInfo.getGlueSource());
-                triggerParam.setGlueUpdatetime(jobInfo.getGlueUpdatetime());
+                triggerParam.setGlueUpdatetime(jobInfo.getGlueUpdateTime());
                 triggerParam.setBroadcastIndex(0); // 默认分片标记为0
                 triggerParam.setBroadcastTotal(1); // 默认分片总数为1
 
-                // 4.2、trigger-run (route run / trigger remote executor)
+                // 设置资源名和资源内容
+                if (jobInfo.getResourceId() != null) {
+                    Map<String, byte[]> map = new HashMap<>();
+                    String[] resourceIds = StringUtils.split(jobInfo.getResourceId(), ",");
+                    for (String resourceIdItem : resourceIds) {
+                        if (StringUtils.isNotBlank(resourceIdItem) && StringUtils.isNumeric(resourceIdItem)) {
+                            XxlJobResource xxlJobResource = XxlJobDynamicScheduler.xxlJobResourceDao.loadById(Integer.valueOf(resourceIdItem));
+                            map.put(xxlJobResource.getFileName(), xxlJobResource.getContent());
+                        }
+                    }
+                    //
+                    triggerParam.setResources(map);
+                }
+                // 设置自定义参数
+                if (jobInfo.getCustomParam() != null){
+                    triggerParam.setCustomParam(jobInfo.getCustomParam());
+                }
+
+                // 4.2、trigger-run (route run / trigger remote executor) 触发调度
                 // 此处用了策略模式，根据不同的策略，使用不同的实现类
                 triggerResult = executorRouteStrategyEnum.getRouter().routeRun(triggerParam, addressList);
                 triggerMsgSb.append("<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>"+ I18nUtil.getString("jobconf_trigger_run") +"<<<<<<<<<<< </span><br>").append(triggerResult.getMsg());
 
-                // 4.3、trigger (fail retry)
+                // 4.3、trigger (fail retry) 调度失败重试
                 if (triggerResult.getCode()!=ReturnT.SUCCESS_CODE && failStrategy == ExecutorFailStrategyEnum.FAIL_RETRY) {
                     triggerResult = executorRouteStrategyEnum.getRouter().routeRun(triggerParam, addressList);
                     triggerMsgSb.append("<br><br><span style=\"color:#F39C12;\" > >>>>>>>>>>>"+ I18nUtil.getString("jobconf_trigger_fail_retry") +"<<<<<<<<<<< </span><br>").append(triggerResult.getMsg());
                 }
             }
 
-            // 5、save trigger-info
+            // 5、save trigger-info 保存触发器信息
             jobLog.setExecutorAddress(triggerResult.getContent());
             jobLog.setTriggerCode(triggerResult.getCode());
             jobLog.setTriggerMsg(triggerMsgSb.toString());

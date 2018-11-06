@@ -7,8 +7,8 @@ public enum GlueTypeEnum {
 
     BEAN("BEAN模式", false, null, null),
     GLUE_GROOVY("GLUE模式(Java)", false, null, null),
-    SHELL("Shell", true, "bash", ".sh"),
-    PYTHON("Python", true, "python", ".py"),
+    SHELL("SHELL", true, "bash", ".sh"),
+    PYTHON("PYTHON", true, "python", ".py"),
     GLUE_NODEJS("GLUE模式(Nodejs)", true, "node", ".js");
 
     private String desc;

@@ -6,11 +6,12 @@ import com.xxl.job.core.glue.GlueTypeEnum;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.log.XxlJobFileAppender;
 import com.xxl.job.core.log.XxlJobLogger;
-import com.xxl.job.core.util.DateUtil;
+import com.xxl.job.core.util.DateTool;
 import com.xxl.job.core.util.ScriptUtil;
 import com.xxl.job.core.util.ShardingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.util.Map;
@@ -54,33 +55,36 @@ public class ScriptJobHandler extends IJobHandler {
         // cmd
         String cmd = glueType.getCmd(); // shell脚本对应bash，python脚本对应python
 
+        if (resources != null) {
+            // 1.在执行器上生成jar等资源文件   2.替换代码中的资源名为资源路径
+            for (Map.Entry<String, byte[]> entry : resources.entrySet()) {
+                // 生成资源文件(资源文件可能有多个)
+                // resourceName = srcpath/resource/resource.jar
 
-        // 1.在执行器上生成jar等资源文件   2.替换代码中的资源名为资源路径
-        for (Map.Entry<String, byte[]> entry : resources.entrySet()){
-            // 生成资源文件(资源文件可能有多个)
-            // resourceName = srcpath/resource/resource.jar
+                String resourceName = XxlJobFileAppender.getResourceSrcPath()
+                        .concat("/")
+                        .concat(String.valueOf(entry.getKey()));
+                if (new File(resourceName).exists()) {
+                    logger.info("=====resource exist: " + resourceName + "=======");
+                    ScriptUtil.deleteFile(resourceName); // 如果原来有资源文件，先删除，再生成新的资源文件
+                }
+                logger.info("=====resource make: " + resourceName + "=======");
+                ScriptUtil.makeResourceFile(resourceName, entry.getValue()); // 资源名，资源内容
 
-            String resourceName = XxlJobFileAppender.getResourceSrcPath()
-                    .concat("/")
-                    .concat(String.valueOf(entry.getKey()));
-            if (new File(resourceName).exists()) {
-                logger.info("=====resource exist: " + resourceName + "=======");
-                ScriptUtil.deleteFile(resourceName); // 如果原来有资源文件，先删除，再生成新的资源文件
+                // 把代码中，资源文件例如{spark_sql_Demo.jar}处替换为带路径的资源，如srcpath/resource/spark_sql_Demo.jar
+                // 由于每个执行器的资源存储路径不同，所以这部分的替换要在各个执行节点上执行，无法在调度中心中替换。
+                String replaceKey = "{" + entry.getKey() + "}";
+                gluesource = gluesource.replace(replaceKey, resourceName);
             }
-            logger.info("=====resource make: " + resourceName + "=======");
-            ScriptUtil.makeResourceFile(resourceName, entry.getValue()); // 资源名，资源内容
-
-            // 把代码中，资源文件例如{spark_sql_Demo.jar}处替换为带路径的资源，如srcpath/resource/spark_sql_Demo.jar
-            // 由于每个执行器的资源存储路径不同，所以这部分的替换要在各个执行节点上执行，无法在调度中心中替换。
-            String replaceKey = "{" + entry.getKey() + "}";
-            gluesource = gluesource.replace(replaceKey, resourceName);
         }
 
-        // 替换代码中的${customParam}参数
-        JSONObject params = JSONObject.parseObject(customParam);
-        for (Map.Entry<String, Object> entry : params.entrySet()){
-            String key = "${" + entry.getKey() + "}";
-            gluesource = gluesource.replace(key, String.valueOf(entry.getValue()));
+        if (customParam != null) {
+            // 替换代码中的${customParam}参数
+            JSONObject params = JSONObject.parseObject(customParam);
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                String key = "${" + entry.getKey() + "}";
+                gluesource = gluesource.replace(key, String.valueOf(entry.getValue()));
+            }
         }
 
         logger.info("=====gluesource:==== " + gluesource);
@@ -90,7 +94,7 @@ public class ScriptJobHandler extends IJobHandler {
                 .concat("/")
                 .concat(String.valueOf(jobId))
                 .concat("_")
-                .concat(DateUtil.convertToLongTime(glueUpdatetime))
+                .concat(DateTool.convertToLongTime(glueUpdatetime))
                 .concat(glueType.getSuffix());
         ScriptUtil.markScriptFile(scriptFileName, gluesource);
 

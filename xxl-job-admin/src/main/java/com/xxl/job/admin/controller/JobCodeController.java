@@ -7,7 +7,7 @@ import com.xxl.job.admin.dao.XxlJobInfoDao;
 import com.xxl.job.admin.dao.XxlJobLogGlueDao;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.glue.GlueTypeEnum;
-import com.xxl.job.core.util.DateUtil;
+import com.xxl.job.core.util.DateTool;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,7 +68,7 @@ public class JobCodeController {
 		// update new code
 		exists_jobInfo.setGlueSource(glueSource);
 		exists_jobInfo.setGlueRemark(glueRemark);
-		exists_jobInfo.setGlueUpdatetime(DateUtil.convertDateTime(new Date()));
+		exists_jobInfo.setGlueUpdateTime(DateTool.convertDateTime(new Date()));
 		xxlJobInfoDao.update(exists_jobInfo);
 
 		// log old code

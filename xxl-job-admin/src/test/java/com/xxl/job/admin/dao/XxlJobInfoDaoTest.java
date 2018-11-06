@@ -1,7 +1,9 @@
 package com.xxl.job.admin.dao;
 
+import com.alibaba.fastjson.JSON;
 import com.xxl.job.admin.core.model.XxlJobInfo;
-import com.xxl.job.core.util.DateUtil;
+import com.xxl.job.admin.core.model.XxlJobResource;
+import com.xxl.job.core.util.DateTool;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -9,7 +11,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath*:spring/applicationcontext-*.xml")
@@ -17,16 +21,22 @@ public class XxlJobInfoDaoTest {
 	
 	@Resource
 	private XxlJobInfoDao xxlJobInfoDao;
+	@Resource
+	private XxlJobResourceDao xxlJobResourceDao;
 	
 	@Test
-	public void pageList(){
-		List<XxlJobInfo> list = xxlJobInfoDao.pageList(0, 20, 0, null, null);
-		int list_count = xxlJobInfoDao.pageListCount(0, 20, 0, null, null);
-		
-		System.out.println(list);
-		System.out.println(list_count);
+	public void pageList1(){
 
-		List<XxlJobInfo> list2 = xxlJobInfoDao.getJobsByGroup(1);
+		System.out.println(xxlJobInfoDao.allJobList());
+
+
+//		List<XxlJobInfo> list = xxlJobInfoDao.pageList(0, 20, 0, null, null);
+//		int list_count = xxlJobInfoDao.pageListCount(0, 20, 0, null, null);
+//
+//		System.out.println(list);
+//		System.out.println(list_count);
+//
+//		List<XxlJobInfo> list2 = xxlJobInfoDao.getJobsByGroup(1);
 	}
 	
 	@Test
@@ -34,6 +44,7 @@ public class XxlJobInfoDaoTest {
 		XxlJobInfo info = new XxlJobInfo();
 		info.setJobGroup(1);
 		info.setJobCron("jobCron");
+		info.setJobName("jobName");
 		info.setJobDesc("desc");
 		info.setAuthor("setAuthor");
 		info.setAlarmEmail("setAlarmEmail");
@@ -51,6 +62,7 @@ public class XxlJobInfoDaoTest {
 
 		XxlJobInfo info2 = xxlJobInfoDao.loadById(info.getId());
 		info2.setJobCron("jobCron2");
+		info.setJobName("jobName");
 		info2.setJobDesc("desc2");
 		info2.setAuthor("setAuthor2");
 		info2.setAlarmEmail("setAlarmEmail2");
@@ -62,7 +74,7 @@ public class XxlJobInfoDaoTest {
 		info2.setGlueType("setGlueType2");
 		info2.setGlueSource("setGlueSource2");
 		info2.setGlueRemark("setGlueRemark2");
-		info2.setGlueUpdatetime(DateUtil.convertDateTime(new Date()));
+		info2.setGlueUpdateTime(DateTool.convertDateTime(new Date()));
 		info2.setChildJobId("1");
 
 		int item2 = xxlJobInfoDao.update(info2);
@@ -74,5 +86,33 @@ public class XxlJobInfoDaoTest {
 		int ret3 = xxlJobInfoDao.findAllCount();
 
 	}
+
+	@Test
+	public void pageList(){
+		// page list
+		System.out.println("==========");
+		List<XxlJobInfo> list = xxlJobInfoDao.pageList(0, 10, 1, "", "");
+//		List<XxlJobResource> list2 = xxlJobResourceDao.pageList(0, 1, "", "", "");
+
+		System.out.println(JSON.toJSONString(list));
+		System.out.println("==========");
+	}
+
+	@Test
+	public void pageList2(){
+		// page list
+		System.out.println("==========");
+		List<XxlJobInfo> list = xxlJobInfoDao.pageListByGlueType(1, 1, 1, "SHELL");
+//		List<XxlJobResource> list2 = xxlJobResourceDao.pageList(0, 1, "", "", "");
+
+		System.out.println(JSON.toJSONString(list));
+
+		int a = xxlJobInfoDao.pageListCountByGlueType(1, 1, 1, "SHELL");
+		System.out.println(a);
+
+		System.out.println("==========");
+	}
+
+
 
 }

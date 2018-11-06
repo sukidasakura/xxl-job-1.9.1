@@ -11,9 +11,7 @@ import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.glue.GlueTypeEnum;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -48,22 +46,72 @@ public class JobInfoController {
 
 		return "jobinfo/jobinfo.index";
 	}
-	
+
+	@RequestMapping(value = "/findAll", method = RequestMethod.POST)
+	@ResponseBody
+	public List<XxlJobInfo> findAll(@RequestParam(required = false, defaultValue = "0") int start,
+									@RequestParam(required = false, defaultValue = "10") int length){
+		return xxlJobService.findAll(start, length);
+	}
+
+
 	@RequestMapping("/pageList")
 	@ResponseBody
-	public Map<String, Object> pageList(@RequestParam(required = false, defaultValue = "0") int start,  
+	public Map<String, Object> pageList(@RequestParam(required = false, defaultValue = "0") int start,
 			@RequestParam(required = false, defaultValue = "10") int length,
 			int jobGroup, String jobDesc, String executorHandler, String filterTime) {
 		
 		return xxlJobService.pageList(start, length, jobGroup, jobDesc, executorHandler, filterTime);
 	}
-	
+
+	@RequestMapping("/pageListByGlueType")
+	@ResponseBody
+	public Map<String, Object> pageListByGlueType(@RequestParam(required = false, defaultValue = "0") int start,
+										@RequestParam(required = false, defaultValue = "10") int length,
+										int jobGroup, String GlueType) {
+
+		return xxlJobService.pageListByGlueType(start, length, jobGroup, GlueType);
+	}
+
+
+
+	@RequestMapping(value = "/allJobList", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> allJobList(){
+		return xxlJobService.allJobList();
+	}
+
+
+	/**
+	 * 获取资源的数量
+	 * @return
+	 */
+	@RequestMapping(value = "counts", method = RequestMethod.GET)
+	@ResponseBody
+	public long counts(){
+		return xxlJobService.counts();
+	}
+
+
+	@RequestMapping("/restAdd")
+	@ResponseBody
+	public ReturnT<String> restAdd(@RequestBody XxlJobInfo jobInfo) {
+		return xxlJobService.restAdd(jobInfo);
+	}
+
 	@RequestMapping("/add")
 	@ResponseBody
 	public ReturnT<String> add(XxlJobInfo jobInfo) {
 		return xxlJobService.add(jobInfo);
 	}
-	
+
+	// 用于data_center的restful接口
+	@RequestMapping("/restUpdate")
+	@ResponseBody
+	public ReturnT<String> restUpdate(@RequestBody XxlJobInfo jobInfo) {
+		return xxlJobService.restUpdate(jobInfo);
+	}
+
 	@RequestMapping("/update")
 	@ResponseBody
 	public ReturnT<String> update(XxlJobInfo jobInfo) {
@@ -75,6 +123,20 @@ public class JobInfoController {
 	@ResponseBody
 	public ReturnT<String> remove(int id) {
 		return xxlJobService.remove(id);
+	}
+
+	// 根据id加载任务
+	@RequestMapping(value = "/load", method = RequestMethod.POST)
+	@ResponseBody
+	public XxlJobInfo load(int id){
+		return xxlJobService.loadById(id);
+	}
+
+	// 手动执行一次任务(立即运行，只用于data_center)
+	@RequestMapping(value = "/triggerByInfo", method = RequestMethod.POST)
+	@ResponseBody
+	public ReturnT<String> triggerJob(@RequestBody XxlJobInfo xxlJobInfo) {
+		return xxlJobService.triggerJobByInfo(xxlJobInfo);
 	}
 
 	// 页面上点击“暂停” 按钮， 前端会发送一个请求 /jobinfo/pause  post 请求
@@ -102,7 +164,18 @@ public class JobInfoController {
 	@RequestMapping("/trigger")
 	@ResponseBody
 	public ReturnT<String> triggerJob(int id) {
-		return xxlJobService.triggerJob(id);
+		return xxlJobService.triggerJobById(id);
 	}
-	
+
+	@RequestMapping("/killRunningJob")
+	@ResponseBody
+	public ReturnT<String> killRunningJob(int id ){
+		return xxlJobService.killRunningJob(id);
+	}
+
+	@RequestMapping("/getNewestJob")
+	@ResponseBody
+	public XxlJobInfo getNewestJob(){
+		return xxlJobService.getNewestJob();
+	}
 }

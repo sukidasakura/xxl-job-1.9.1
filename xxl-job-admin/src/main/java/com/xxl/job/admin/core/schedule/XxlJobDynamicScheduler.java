@@ -2,12 +2,10 @@ package com.xxl.job.admin.core.schedule;
 
 import com.xxl.job.admin.core.jobbean.RemoteHttpJobBean;
 import com.xxl.job.admin.core.model.XxlJobInfo;
+import com.xxl.job.admin.core.model.XxlJobResource;
 import com.xxl.job.admin.core.thread.JobFailMonitorHelper;
 import com.xxl.job.admin.core.thread.JobRegistryMonitorHelper;
-import com.xxl.job.admin.dao.XxlJobGroupDao;
-import com.xxl.job.admin.dao.XxlJobInfoDao;
-import com.xxl.job.admin.dao.XxlJobLogDao;
-import com.xxl.job.admin.dao.XxlJobRegistryDao;
+import com.xxl.job.admin.dao.*;
 import com.xxl.job.core.biz.AdminBiz;
 import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.rpc.netcom.NetComClientProxy;
@@ -60,6 +58,7 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
     public static XxlJobInfoDao xxlJobInfoDao;
     public static XxlJobRegistryDao xxlJobRegistryDao;
     public static XxlJobGroupDao xxlJobGroupDao;
+    public static XxlJobResourceDao xxlJobResourceDao;
     public static AdminBiz adminBiz;
 
     // ---------------------- applicationContext ----------------------
@@ -69,6 +68,7 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
 		XxlJobDynamicScheduler.xxlJobInfoDao = applicationContext.getBean(XxlJobInfoDao.class);
         XxlJobDynamicScheduler.xxlJobRegistryDao = applicationContext.getBean(XxlJobRegistryDao.class);
         XxlJobDynamicScheduler.xxlJobGroupDao = applicationContext.getBean(XxlJobGroupDao.class);
+        XxlJobDynamicScheduler.xxlJobResourceDao = applicationContext.getBean(XxlJobResourceDao.class);
         XxlJobDynamicScheduler.adminBiz = applicationContext.getBean(AdminBiz.class);
 	}
 
@@ -106,7 +106,7 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
         }
 
         // load-cache
-        address = address.trim();
+        address = address.trim(); //删除前后两端空白字符
         // 查看缓存里面是否存在，如果存在则不需要去创建executorBiz了
         ExecutorBiz executorBiz = executorBizRepository.get(address);
         if (executorBiz != null) {
@@ -123,7 +123,7 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
     // ---------------------- schedule util ----------------------
 
     /**
-     * fill job info
+     * fill job info 把任务加入到指定执行器的调度器中
      *
      * @param jobInfo
      */
@@ -202,15 +202,18 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
 
         // JobDetail : jobClass
 		Class<? extends Job> jobClass_ = RemoteHttpJobBean.class;   // Class.forName(jobInfo.getJobClass());
-        
-		JobDetail jobDetail = JobBuilder.newJob(jobClass_).withIdentity(jobKey).build();
+        //定义一个JobDetail
+		JobDetail jobDetail = JobBuilder.
+                newJob(jobClass_)
+                .withIdentity(jobKey)
+                .build();
         /*if (jobInfo.getJobData()!=null) {
         	JobDataMap jobDataMap = jobDetail.getJobDataMap();
         	jobDataMap.putAll(JacksonUtil.readValue(jobInfo.getJobData(), Map.class));	
         	// JobExecutionContext context.getMergedJobDataMap().get("mailGuid");
 		}*/
         
-        // schedule : jobDetail + cronTrigger
+        // schedule : jobDetail + cronTrigger  加入这个调度
         Date date = scheduler.scheduleJob(jobDetail, cronTrigger);
 
         logger.info(">>>>>>>>>>> addJob success, jobDetail:{}, cronTrigger:{}, date:{}", jobDetail, cronTrigger, date);
@@ -218,7 +221,7 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
     }
     
     /**
-     * rescheduleJob
+     * rescheduleJob 重新调度任务
      *
      * @param jobGroup
      * @param jobName
@@ -246,8 +249,14 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
             }
 
             // CronTrigger : TriggerKey + cronExpression
-            CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression).withMisfireHandlingInstructionDoNothing();
-            oldTrigger = oldTrigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(cronScheduleBuilder).build();
+            CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder
+                    .cronSchedule(cronExpression) // Trigger已存在，那么更新相应的定时设置
+                    .withMisfireHandlingInstructionDoNothing();
+            oldTrigger = oldTrigger // 按照新的cronExpression表达式重新构建trigger
+                    .getTriggerBuilder()
+                    .withIdentity(triggerKey)
+                    .withSchedule(cronScheduleBuilder)
+                    .build();
 
             // rescheduleJob
             scheduler.rescheduleJob(triggerKey, oldTrigger);
@@ -294,7 +303,7 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
     }
 
     /**
-     * pause
+     * pause 暂停任务
      *
      * @param jobName
      * @param jobGroup
@@ -307,7 +316,7 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
         
         boolean result = false;
         if (checkExists(jobName, jobGroup)) {
-            // 暂停任务
+            // 暂停触发器
             scheduler.pauseTrigger(triggerKey);
             result = true;
             logger.info(">>>>>>>>>>> pauseJob success, triggerKey:{}", triggerKey);
@@ -318,7 +327,7 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
     }
     
     /**
-     * resume
+     * resume 恢复任务
      *
      * @param jobName
      * @param jobGroup
@@ -342,7 +351,7 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
     }
     
     /**
-     * run
+     * run 触发任务
      *
      * @param jobName
      * @param jobGroup

@@ -1,44 +1,61 @@
 package com.xxl.job.admin.core.model;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * xxl-job info
  * @author xuxueli  2016-1-12 18:25:49
  */
 public class XxlJobInfo {
-	
-	private int id;				// 主键ID	    (JobKey.name)
-	
-	private int jobGroup;		// 执行器主键ID	(JobKey.group)
-	private String jobCron;		// 任务执行CRON表达式 【base on quartz】
+
+	/** 主键ID  (JobKey.name) **/
+	private int id;
+
+	/** 执行器主键ID (JobKey.group)**/
+	private int jobGroup;
+	/** 任务执行Cron表达式 **/
+	private String jobCron;
+	/** 任务名称 **/
+	private String jobName;
+	/** 任务描述 **/
 	private String jobDesc;
-	
+
 	private String addTime;
 	private String updateTime;
-	
-	private String author;		// 负责人
-	private String alarmEmail;	// 报警邮件
 
-	private String executorRouteStrategy;	// 执行器路由策略
-	private String executorHandler;		    // 执行器，任务Handler名称
-	private String executorParam;		    // 执行器，任务参数
-	private String executorBlockStrategy;	// 阻塞处理策略
-	private String executorFailStrategy;	// 失败处理策略
-	
-	private String glueType;		// GLUE类型	#com.xxl.job.core.glue.GlueTypeEnum
-	private String glueSource;		// GLUE源代码
-	private String glueRemark;		// GLUE备注
-	private String glueUpdatetime;	// GLUE更新时间
+	private String author;		// 负责人
+    private String alarmEmail;	// 报警邮件
+
+	/** 执行器路由策略 **/
+	private String executorRouteStrategy;
+	/** 执行器，任务Handler名称 **/
+	private String executorHandler;
+	/** 执行器，任务参数 **/
+	private String executorParam;
+
+	/** 阻塞处理策略 **/
+	private String executorBlockStrategy;
+	/** 失败处理策略 **/
+	private String executorFailStrategy;
+
+	/** glue类型 **/
+	private String glueType;
+	/** glue源代码 **/
+	private String glueSource;
+	/** glue备注 **/
+	private String glueRemark;
+	/** glue更新时间 **/
+	private String glueUpdateTime;
 
 	private String childJobId;		// 子任务ID，多个逗号分隔
-	
-	// copy from quartz
-	private String jobStatus;		// 任务状态 【base on quartz】
+
+	/** 任务状态（base on quartz）从quartz拷贝过来的 **/
+	private String jobStatus;
 
 	/** 资源ID，多个逗号分隔 **/
 	private String resourceId;
-	/** 自定义参数 **/
+	/** 自定义参数，可能多个，格式为{"param1":"1","param2":"2"}，需要转化为JSONObject **/
 	private String customParam;
 
 	public String getCustomParam() {
@@ -177,12 +194,20 @@ public class XxlJobInfo {
 		this.updateTime = updateTime;
 	}
 
-	public String getGlueUpdatetime() {
-		return glueUpdatetime;
+	public String getJobName() {
+		return jobName;
 	}
 
-	public void setGlueUpdatetime(String glueUpdatetime) {
-		this.glueUpdatetime = glueUpdatetime;
+	public void setJobName(String jobName) {
+		this.jobName = jobName;
+	}
+
+	public String getGlueUpdateTime() {
+		return glueUpdateTime;
+	}
+
+	public void setGlueUpdateTime(String glueUpdateTime) {
+		this.glueUpdateTime = glueUpdateTime;
 	}
 
 	public String getChildJobId() {
@@ -208,4 +233,6 @@ public class XxlJobInfo {
 	public void setResourceId(String resourceId) {
 		this.resourceId = resourceId;
 	}
+
+
 }

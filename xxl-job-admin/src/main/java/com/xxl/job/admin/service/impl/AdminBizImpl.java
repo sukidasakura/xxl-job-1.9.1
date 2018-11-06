@@ -12,7 +12,7 @@ import com.xxl.job.core.biz.model.HandleCallbackParam;
 import com.xxl.job.core.biz.model.RegistryParam;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
-import com.xxl.job.core.util.DateUtil;
+import com.xxl.job.core.util.DateTool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class AdminBizImpl implements AdminBiz {
 
     private ReturnT<String> callback(HandleCallbackParam handleCallbackParam) {
         // valid log item
-        XxlJobLog log = xxlJobLogDao.load(handleCallbackParam.getLogId());
+        XxlJobLog log = xxlJobLogDao.loadByLogId(handleCallbackParam.getLogId());
         if (log == null) {
             return new ReturnT<String>(ReturnT.FAIL_CODE, "log item not found.");
         }
@@ -72,7 +72,7 @@ public class AdminBizImpl implements AdminBiz {
                 for (int i = 0; i < childJobIds.length; i++) {
                     int childJobId = (StringUtils.isNotBlank(childJobIds[i]) && StringUtils.isNumeric(childJobIds[i]))?Integer.valueOf(childJobIds[i]):-1;
                     if (childJobId > 0) {
-                        ReturnT<String> triggerChildResult = xxlJobService.triggerJob(childJobId);
+                        ReturnT<String> triggerChildResult = xxlJobService.triggerJobById(childJobId);
 
                         // add msg
                         callbackMsg += MessageFormat.format(I18nUtil.getString("jobconf_callback_child_msg1"),
@@ -91,7 +91,7 @@ public class AdminBizImpl implements AdminBiz {
 
             }
         } else if (IJobHandler.FAIL_RETRY.getCode() == handleCallbackParam.getExecuteResult().getCode()){
-            ReturnT<String> retryTriggerResult = xxlJobService.triggerJob(log.getJobId());
+            ReturnT<String> retryTriggerResult = xxlJobService.triggerJobById(log.getJobId());
             callbackMsg = "<br><br><span style=\"color:#F39C12;\" > >>>>>>>>>>>"+ I18nUtil.getString("jobconf_exe_fail_retry") +"<<<<<<<<<<< </span><br>";
 
             callbackMsg += MessageFormat.format(I18nUtil.getString("jobconf_callback_msg1"),
@@ -111,7 +111,7 @@ public class AdminBizImpl implements AdminBiz {
         }
 
         // success, save log
-        log.setHandleTime(DateUtil.convertDateTime(new Date()));
+        log.setHandleTime(DateTool.convertDateTime(new Date()));
         log.setHandleCode(handleCallbackParam.getExecuteResult().getCode());
         log.setHandleMsg(handleMsg.toString());
         xxlJobLogDao.updateHandleInfo(log);
@@ -123,7 +123,7 @@ public class AdminBizImpl implements AdminBiz {
     public ReturnT<String> registry(RegistryParam registryParam) {
         int ret = xxlJobRegistryDao.registryUpdate(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
         if (ret < 1) {
-            xxlJobRegistryDao.registrySave(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
+            xxlJobRegistryDao.registrySave(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue(), DateTool.convertDateTime(new Date()));
         }
         return ReturnT.SUCCESS;
     }
@@ -136,7 +136,7 @@ public class AdminBizImpl implements AdminBiz {
 
     @Override
     public ReturnT<String> triggerJob(int jobId) {
-        return xxlJobService.triggerJob(jobId);
+        return xxlJobService.triggerJobById(jobId);
     }
 
 }

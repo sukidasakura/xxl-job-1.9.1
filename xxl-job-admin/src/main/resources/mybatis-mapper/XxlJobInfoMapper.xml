@@ -8,6 +8,7 @@
 	
 		<result column="job_group" property="jobGroup" />
 	    <result column="job_cron" property="jobCron" />
+		<result column="job_name" property="jobName" />
 	    <result column="job_desc" property="jobDesc" />
 	    
 	    <result column="add_time" property="addTime" />
@@ -25,15 +26,18 @@
 	    <result column="glue_type" property="glueType" />
 	    <result column="glue_source" property="glueSource" />
 	    <result column="glue_remark" property="glueRemark" />
-		<result column="glue_updatetime" property="glueUpdatetime" />
+		<result column="glue_updatetime" property="glueUpdateTime" />
 
 		<result column="child_jobid" property="childJobId" />
+		<result column="custom_param" property="customParam" />
+		<result column="resource_id" property="resourceId" />
 	</resultMap>
 
 	<sql id="Base_Column_List">
 		t.id,
 		t.job_group,
 		t.job_cron,
+		t.job_name,
 		t.job_desc,
 		t.add_time,
 		t.update_time,
@@ -48,14 +52,36 @@
 		t.glue_source,
 		t.glue_remark,
 		t.glue_updatetime,
-		t.child_jobid
+		t.child_jobid,
+		t.custom_param,
+		t.resource_id
 	</sql>
-	
+
+
+	<select id="findAll" resultMap="XxlJobInfo">
+		SELECT <include refid="Base_Column_List" />
+		FROM XXL_JOB_QRTZ_TRIGGER_INFO AS t
+		ORDER BY t.`id`DESC
+		LIMIT #{offset}, #{pagesize}
+	</select>
+
+
+	<select id="allJobList" resultMap="XxlJobInfo">
+		SELECT <include refid="Base_Column_List" />
+		FROM XXL_JOB_QRTZ_TRIGGER_INFO AS t
+		ORDER BY id DESC
+	</select>
+
+	<select id="counts" resultType="java.lang.Long">
+		SELECT COUNT(*)
+		FROM XXL_JOB_QRTZ_TRIGGER_INFO
+	</select>
+
 	<select id="pageList" parameterType="java.util.HashMap" resultMap="XxlJobInfo">
 		SELECT <include refid="Base_Column_List" />
 		FROM XXL_JOB_QRTZ_TRIGGER_INFO AS t
 		<trim prefix="WHERE" prefixOverrides="AND | OR" >
-			<if test="jobGroup gt 0">
+			<if test="jobGroup gt 0"><!--如果大于0-->
 				AND t.job_group = #{jobGroup}
 			</if>
 			<if test="jobDesc != null and jobDesc != ''">
@@ -88,10 +114,45 @@
 		</trim>
 	</select>
 
+
+	<select id="pageListByGlueType" parameterType="java.util.HashMap" resultMap="XxlJobInfo">
+		SELECT <include refid="Base_Column_List" />
+		FROM XXL_JOB_QRTZ_TRIGGER_INFO AS t
+		<trim prefix="WHERE" prefixOverrides="AND | OR" >
+			<if test="jobGroup gte 0">
+				AND t.job_group = #{jobGroup}
+			</if>
+			<if test="glueType != null and glueType != ''">
+				AND t.glue_type = #{glueType}
+			</if>
+		</trim>
+		ORDER BY id DESC
+		LIMIT #{offset}, #{pagesize}<!--mybatis中实现分页查询-->
+	</select>
+
+	<select id="pageListCountByGlueType" parameterType="java.util.HashMap" resultType="int">
+		SELECT count(1)
+		FROM XXL_JOB_QRTZ_TRIGGER_INFO AS t
+		<!--prefix:在trim标签内sql语句加上前缀
+		prefixOverrides:指定去除多余的前缀内容-->
+		<trim prefix="WHERE" prefixOverrides="AND | OR" >
+			<if test="jobGroup gte 0">
+				AND t.job_group = #{jobGroup}
+			</if>
+			<if test="glueType != null and glueType != ''">
+				<!--“%zhang%”模糊查询, concat连接字符串-->
+				AND t.glue_type = #{glueType}
+			</if>
+		</trim>
+	</select>
+
+
+
 	<insert id="save" parameterType="com.xxl.job.admin.core.model.XxlJobInfo" useGeneratedKeys="true" keyProperty="id" >
 		INSERT INTO XXL_JOB_QRTZ_TRIGGER_INFO (
 			job_group,
 			job_cron,
+		    job_name,
 			job_desc,
 			add_time,
 			update_time,
@@ -106,13 +167,16 @@
 			glue_source,
 			glue_remark,
 			glue_updatetime,
-			child_jobid
+			child_jobid,
+		    custom_param,
+		    resource_id
 		) VALUES (
 			#{jobGroup},
-			#{jobCron}, 
+			#{jobCron},
+		    #{jobName},
 			#{jobDesc},
-			NOW(),
-			NOW(),
+		    #{addTime},
+		    #{updateTime},
 			#{author},
 			#{alarmEmail},
 			#{executorRouteStrategy},
@@ -123,8 +187,10 @@
 			#{glueType},
 			#{glueSource},
 			#{glueRemark},
-			NOW(),
-			#{childJobId}
+		    #{glueUpdateTime},
+			#{childJobId},
+		    #{customParam},
+		    #{resourceId}
 		);
 		<!--<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
 			SELECT LAST_INSERT_ID()
@@ -142,8 +208,10 @@
 		UPDATE XXL_JOB_QRTZ_TRIGGER_INFO
 		SET 
 			job_cron = #{jobCron},
+			job_name = #{jobName},
 			job_desc = #{jobDesc},
-			update_time = NOW(),
+			job_group = #{jobGroup},
+			update_time = #{updateTime},
 			author = #{author},
 			alarm_email = #{alarmEmail},
 			executor_route_strategy = #{executorRouteStrategy},
@@ -154,8 +222,10 @@
 			glue_type = #{glueType},
 			glue_source = #{glueSource},
 			glue_remark = #{glueRemark},
-			glue_updatetime = #{glueUpdatetime},
-			child_jobid = #{childJobId}
+			glue_updatetime = #{glueUpdateTime},
+			child_jobid = #{childJobId},
+			custom_param = #{customParam},
+			resource_id = #{resourceId}
 		WHERE id = #{id}
 	</update>
 	
@@ -174,6 +244,13 @@
 	<select id="findAllCount" resultType="int">
 		SELECT count(1)
 		FROM XXL_JOB_QRTZ_TRIGGER_INFO
+	</select>
+
+	<select id="getNewestJob" parameterType="java.util.HashMap" resultMap="XxlJobInfo">
+		select <include refid="Base_Column_List" />
+		FROM XXL_JOB_QRTZ_TRIGGER_INFO AS t
+		ORDER BY id DESC
+		LIMIT 1
 	</select>
 
 </mapper>

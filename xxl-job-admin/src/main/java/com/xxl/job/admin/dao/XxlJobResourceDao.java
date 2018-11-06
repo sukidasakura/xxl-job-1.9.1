@@ -32,8 +32,12 @@ public interface XxlJobResourceDao {
                       @Param("describe") String describe,
                       @Param("type") String type);
 
+    // 查找记录数
+    long counts();
+
     // 查找所有资源
-    List<XxlJobResource> findAll();
+    List<XxlJobResource> findAll(@Param("offset") int offset,
+                                 @Param("pagesize") int pagesize);
 
     // 上传文件资源到数据库
     int upload(XxlJobResource resource);

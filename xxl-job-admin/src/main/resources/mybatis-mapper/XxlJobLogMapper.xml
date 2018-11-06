@@ -40,12 +40,25 @@
 		t.handle_code,
 		t.handle_msg
 	</sql>
-	
+
+	<select id="findAll" resultMap="XxlJobLog">
+		SELECT <include refid="Base_Column_List" />
+		FROM XXL_JOB_QRTZ_TRIGGER_LOG AS t
+		ORDER BY t.id ASC
+		LIMIT #{offset}, #{pagesize}
+	</select>
+
+	<select id="counts" resultType="java.lang.Long">
+		SELECT COUNT(*)
+		FROM XXL_JOB_QRTZ_TRIGGER_LOG
+	</select>
+
+
 	<select id="pageList" resultMap="XxlJobLog">
 		SELECT <include refid="Base_Column_List" />
 		FROM XXL_JOB_QRTZ_TRIGGER_LOG AS t
 		<trim prefix="WHERE" prefixOverrides="AND | OR" >
-			<if test="jobGroup != null and jobGroup != ''">
+			<if test="jobGroup gte 0">
 				AND t.job_group = #{jobGroup}
 			</if>
 			<if test="jobId gt 0">
@@ -78,7 +91,7 @@
 		SELECT count(1)
 		FROM XXL_JOB_QRTZ_TRIGGER_LOG AS t
 		<trim prefix="WHERE" prefixOverrides="AND | OR" >
-			<if test="jobGroup != null and jobGroup != ''">
+			<if test="jobGroup gte 0">
 				AND t.job_group = #{jobGroup}
 			</if>
 			<if test="jobId gt 0">
@@ -104,13 +117,27 @@
 			</if>
 		</trim>
 	</select>
-	
-	<select id="load" parameterType="java.lang.Integer" resultMap="XxlJobLog">
+
+
+	<select id="getLogByLogId" parameterType="java.lang.Integer" resultMap="XxlJobLog">
+		SELECT <include refid="Base_Column_List" />
+		FROM XXL_JOB_QRTZ_TRIGGER_LOG AS t
+		WHERE t.id = #{logId}
+	</select>
+
+
+
+	<select id="loadByLogId" parameterType="java.lang.Integer" resultMap="XxlJobLog">
 		SELECT <include refid="Base_Column_List" />
 		FROM XXL_JOB_QRTZ_TRIGGER_LOG AS t
 		WHERE t.id = #{id}
 	</select>
 
+	<select id="loadByJobId" parameterType="java.lang.Integer" resultMap="XxlJobLog">
+		SELECT <include refid="Base_Column_List" />
+		FROM XXL_JOB_QRTZ_TRIGGER_LOG AS t
+		WHERE t.job_id = #{jobId}
+	</select>
 	
 	<insert id="save" parameterType="com.xxl.job.admin.core.model.XxlJobLog" useGeneratedKeys="true" keyProperty="id" >
 		INSERT INTO XXL_JOB_QRTZ_TRIGGER_LOG (
@@ -204,5 +231,13 @@
 			</if>
 		</trim>
 	</delete>
+
+	<select id="getCurrentLog" parameterType="java.lang.Integer" resultMap="XxlJobLog">
+		select <include refid="Base_Column_List" />
+		FROM XXL_JOB_QRTZ_TRIGGER_LOG AS t
+		WHERE job_id = #{jobId}
+		ORDER BY id DESC
+		LIMIT 1
+	</select>
 	
 </mapper>

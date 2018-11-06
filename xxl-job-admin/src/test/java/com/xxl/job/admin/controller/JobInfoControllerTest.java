@@ -1,7 +1,11 @@
 package com.xxl.job.admin.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.xxl.job.admin.controller.interceptor.PermissionInterceptor;
 import com.xxl.job.admin.core.conf.XxlJobAdminConfig;
+import com.xxl.job.admin.core.model.XxlJobInfo;
+import com.xxl.job.admin.dao.XxlJobInfoDao;
+import com.xxl.job.admin.service.XxlJobService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
@@ -9,6 +13,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -16,6 +21,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class JobInfoControllerTest extends AbstractSpringMvcTest {
 
   private Cookie cookie;
+
+  @Resource
+  private XxlJobService xxlJobService;
+  @Resource
+  private XxlJobInfoDao xxlJobInfoDao;
 
   @Before
   public void login() throws Exception {
@@ -42,6 +52,17 @@ public class JobInfoControllerTest extends AbstractSpringMvcTest {
     ).andReturn();
 
     System.out.println(ret.getResponse().getContentAsString());
+  }
+
+  @Test
+  public void testGetNewestJob(){
+    XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadById(1);
+    System.out.println("=========");
+    if (xxlJobInfo != null) {
+      System.out.println(JSON.toJSONString(xxlJobInfo));
+    }
+    System.out.println("null");
+    System.out.println("=========");
   }
 
 }

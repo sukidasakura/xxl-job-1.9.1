@@ -1,8 +1,8 @@
 package com.xxl.job.admin.dao;
 
+import com.alibaba.fastjson.JSON;
 import com.xxl.job.admin.core.model.XxlJobLog;
-import com.xxl.job.admin.dao.XxlJobLogDao;
-import com.xxl.job.core.util.DateUtil;
+import com.xxl.job.core.util.DateTool;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,41 +23,43 @@ public class XxlJobLogDaoTest {
 
     @Test
     public void test(){
-        List<XxlJobLog> list = xxlJobLogDao.pageList(0, 10, 1, 1, null, null, 1);
-        int list_count = xxlJobLogDao.pageListCount(0, 10, 1, 1, null, null, 1);
-
-        XxlJobLog log = new XxlJobLog();
-        log.setJobGroup(1);
-        log.setJobId(1);
-
-        int ret1 = xxlJobLogDao.save(log);
-        XxlJobLog dto = xxlJobLogDao.load(log.getId());
-
-        log.setGlueType("1");
-        log.setTriggerTime(DateUtil.convertDateTime(new Date()));
-        log.setTriggerCode(1);
-        log.setTriggerMsg("1");
-        log.setExecutorAddress("1");
-        log.setExecutorHandler("1");
-        log.setExecutorParam("1");
-        ret1 = xxlJobLogDao.updateTriggerInfo(log);
-        dto = xxlJobLogDao.load(log.getId());
 
 
-        log.setHandleTime(DateUtil.convertDateTime(new Date()));
-        log.setHandleCode(2);
-        log.setHandleMsg("2");
-        ret1 = xxlJobLogDao.updateHandleInfo(log);
-        dto = xxlJobLogDao.load(log.getId());
-
-
-        List<Map<String, Object>> list2 = xxlJobLogDao.triggerCountByDay(DateUtils.addDays(new Date(), 30), new Date());
-
-        int ret4 = xxlJobLogDao.clearLog(1, 1, new Date(), 100);
-
-        int ret2 = xxlJobLogDao.delete(log.getJobId());
-
-        int ret3 = xxlJobLogDao.triggerCountByHandleCode(-1);
+        System.out.println("==========");
+        System.out.println(xxlJobLogDao.getLogByLogId(40));
+        System.out.println("============");
+//        XxlJobLog log = new XxlJobLog();
+//        log.setJobGroup(1);
+//        log.setJobId(1);
+//
+//        int ret1 = xxlJobLogDao.save(log);
+//        XxlJobLog dto = xxlJobLogDao.loadByLogId(log.getId());
+//
+//        log.setGlueType("1");
+//        log.setTriggerTime(DateTool.convertDateTime(new Date()));
+//        log.setTriggerCode(1);
+//        log.setTriggerMsg("1");
+//        log.setExecutorAddress("1");
+//        log.setExecutorHandler("1");
+//        log.setExecutorParam("1");
+//        ret1 = xxlJobLogDao.updateTriggerInfo(log);
+//        dto = xxlJobLogDao.loadByLogId(log.getId());
+//
+//
+//        log.setHandleTime(DateTool.convertDateTime(new Date()));
+//        log.setHandleCode(2);
+//        log.setHandleMsg("2");
+//        ret1 = xxlJobLogDao.updateHandleInfo(log);
+//        dto = xxlJobLogDao.loadByLogId(log.getId());
+//
+//
+//        List<Map<String, Object>> list2 = xxlJobLogDao.triggerCountByDay(DateUtils.addDays(new Date(), 30), new Date());
+//
+//        int ret4 = xxlJobLogDao.clearLog(1, 1, new Date(), 100);
+//
+//        int ret2 = xxlJobLogDao.delete(log.getJobId());
+//
+//        int ret3 = xxlJobLogDao.triggerCountByHandleCode(-1);
     }
 
 }
