@@ -123,7 +123,7 @@
 				AND t.job_group = #{jobGroup}
 			</if>
 			<if test="glueType != null and glueType != ''">
-				AND t.glue_type = #{glueType}
+				AND t.glue_type like CONCAT(CONCAT('%', #{glueType}), '%')
 			</if>
 		</trim>
 		ORDER BY id DESC
@@ -141,7 +141,7 @@
 			</if>
 			<if test="glueType != null and glueType != ''">
 				<!--“%zhang%”模糊查询, concat连接字符串-->
-				AND t.glue_type = #{glueType}
+				AND t.glue_type like CONCAT(CONCAT('%', #{glueType}), '%')
 			</if>
 		</trim>
 	</select>
@@ -251,6 +251,12 @@
 		FROM XXL_JOB_QRTZ_TRIGGER_INFO AS t
 		ORDER BY id DESC
 		LIMIT 1
+	</select>
+
+	<select id="getUsedResources" parameterType="java.util.HashMap" resultType="int">
+		SELECT DISTINCT t.resource_id
+		FROM XXL_JOB_QRTZ_TRIGGER_INFO AS t
+		WHERE resource_id > 0
 	</select>
 
 </mapper>

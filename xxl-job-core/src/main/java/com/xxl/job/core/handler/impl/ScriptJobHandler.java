@@ -65,10 +65,10 @@ public class ScriptJobHandler extends IJobHandler {
                         .concat("/")
                         .concat(String.valueOf(entry.getKey()));
                 if (new File(resourceName).exists()) {
-                    logger.info("=====resource exist: " + resourceName + "=======");
+                    logger.info("[ resource exist: " + resourceName + " ] ");
                     ScriptUtil.deleteFile(resourceName); // 如果原来有资源文件，先删除，再生成新的资源文件
                 }
-                logger.info("=====resource make: " + resourceName + "=======");
+                logger.info("[ resource make: " + resourceName + " ]");
                 ScriptUtil.makeResourceFile(resourceName, entry.getValue()); // 资源名，资源内容
 
                 // 把代码中，资源文件例如{spark_sql_Demo.jar}处替换为带路径的资源，如srcpath/resource/spark_sql_Demo.jar
@@ -87,7 +87,6 @@ public class ScriptJobHandler extends IJobHandler {
             }
         }
 
-        logger.info("=====gluesource:==== " + gluesource);
         // make script file 生成脚本文件
         // 格式为：srcpath/gluesource/1_1533800850000.sh
         String scriptFileName = XxlJobFileAppender.getGlueSrcPath()
@@ -110,9 +109,10 @@ public class ScriptJobHandler extends IJobHandler {
         scriptParams[2] = String.valueOf(shardingVO.getTotal());
 
         // invoke
-        XxlJobLogger.log("--------- script file:"+ scriptFileName +" --------");
+        XxlJobLogger.log("<br> [ script file:"+ scriptFileName +"  ] <br><br>");
         // 执行任务，并将结果输出到日志
         int exitValue = ScriptUtil.execToFile(cmd, scriptFileName, logFileName, scriptParams);
+        XxlJobLogger.log("<br> <br>");
         ReturnT<String> result = (exitValue==0)?IJobHandler.SUCCESS:new ReturnT<String>(IJobHandler.FAIL.getCode(), "script exit value("+exitValue+") is failed");
         return result;
     }

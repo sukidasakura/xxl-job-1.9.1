@@ -16,7 +16,7 @@ import org.junit.Test;
 public class AdminBizTest {
 
     // admin-client
-    private static String addressUrl = "http://127.0.0.1:8080/xxl-job-admin".concat(AdminBiz.MAPPING);
+    private static String addressUrl = "http://10.10.77.136:8100/xxl-job-admin".concat(AdminBiz.MAPPING);
     private static String accessToken = null;
 
     /**
@@ -62,5 +62,14 @@ public class AdminBizTest {
         ReturnT<String> returnT = adminBiz.triggerJob(jobId);
         Assert.assertTrue(returnT.getCode() == ReturnT.SUCCESS_CODE);
     }
+
+//    @Test
+//    public void killPid() throws Exception {
+//        AdminBiz adminBiz = (AdminBiz) new NetComClientProxy(AdminBiz.class, addressUrl, accessToken).getObject();
+//
+//        int jobId = 54;
+//        ReturnT<String> returnT = adminBiz.kill(jobId);
+//        Assert.assertTrue(returnT.getCode() == ReturnT.SUCCESS_CODE);
+//    }
 
 }

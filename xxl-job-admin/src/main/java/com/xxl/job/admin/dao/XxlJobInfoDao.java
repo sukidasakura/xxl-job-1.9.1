@@ -112,4 +112,7 @@ public interface XxlJobInfoDao {
 	// 获取最新添加的任务
 	XxlJobInfo getNewestJob();
 
+	// 筛选使用中的资源
+	List<Integer> getUsedResources();
+
 }

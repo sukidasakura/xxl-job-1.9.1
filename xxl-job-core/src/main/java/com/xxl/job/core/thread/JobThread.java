@@ -124,12 +124,12 @@ public class JobThread extends Thread{
 					ShardingUtil.setShardingVo(new ShardingUtil.ShardingVO(triggerParam.getBroadcastIndex(), triggerParam.getBroadcastTotal()));
 
 					// execute 执行
-					XxlJobLogger.log("<br>----------- job execute start -----------");
+					XxlJobLogger.log("<br>[ job execute start ] <br>");
 					executeResult = handler.execute(triggerParam.getExecutorParams());
 					if (executeResult == null) {
 						executeResult = IJobHandler.FAIL;
 					}
-					XxlJobLogger.log("<br>----------- job execute end(finish) -----------<br>----------- ReturnT:" + executeResult);
+					XxlJobLogger.log("<br>[ job execute end(finish) ] <br> [ ReturnT:" + executeResult + " ] <br>");
 
 				} else {
 					if (idleTimes > 30) {
@@ -139,7 +139,7 @@ public class JobThread extends Thread{
 				}
 			} catch (Throwable e) {
 				if (toStop) {
-					XxlJobLogger.log("<br>----------- JobThread toStop, stopReason:" + stopReason);
+					XxlJobLogger.log("<br>[ JobThread toStop, stopReason:" + stopReason + " ] <br>");
 				}
 
 				StringWriter stringWriter = new StringWriter();
@@ -147,7 +147,7 @@ public class JobThread extends Thread{
 				String errorMsg = stringWriter.toString();
 				executeResult = new ReturnT<String>(ReturnT.FAIL_CODE, errorMsg);
 
-				XxlJobLogger.log("<br>----------- JobThread Exception:" + errorMsg + "<br>----------- job execute end(error) -----------");
+				XxlJobLogger.log("<br>[ JobThread Exception:" + errorMsg + " ] <br>[ job execute end(error) ] <br>");
 			} finally {
                 if(triggerParam != null) {
                     // callback handler info

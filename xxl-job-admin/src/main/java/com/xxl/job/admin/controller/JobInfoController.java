@@ -68,9 +68,9 @@ public class JobInfoController {
 	@ResponseBody
 	public Map<String, Object> pageListByGlueType(@RequestParam(required = false, defaultValue = "0") int start,
 										@RequestParam(required = false, defaultValue = "10") int length,
-										int jobGroup, String GlueType) {
+										int jobGroup, String glueType) {
 
-		return xxlJobService.pageListByGlueType(start, length, jobGroup, GlueType);
+		return xxlJobService.pageListByGlueType(start, length, jobGroup, glueType);
 	}
 
 

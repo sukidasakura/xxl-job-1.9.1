@@ -21,9 +21,7 @@ public class XxlJobInfoDaoTest {
 	
 	@Resource
 	private XxlJobInfoDao xxlJobInfoDao;
-	@Resource
-	private XxlJobResourceDao xxlJobResourceDao;
-	
+
 	@Test
 	public void pageList1(){
 
@@ -102,17 +100,28 @@ public class XxlJobInfoDaoTest {
 	public void pageList2(){
 		// page list
 		System.out.println("==========");
-		List<XxlJobInfo> list = xxlJobInfoDao.pageListByGlueType(1, 1, 1, "SHELL");
+		List<XxlJobInfo> list = xxlJobInfoDao.pageListByGlueType(0, 50, 1, "PYTHON");
 //		List<XxlJobResource> list2 = xxlJobResourceDao.pageList(0, 1, "", "", "");
 
-		System.out.println(JSON.toJSONString(list));
+		for (XxlJobInfo i : list){
+			System.out.println(i.getId() + i.getGlueType());
+		}
+		System.out.println("=====");
 
-		int a = xxlJobInfoDao.pageListCountByGlueType(1, 1, 1, "SHELL");
-		System.out.println(a);
-
-		System.out.println("==========");
+//		int a = xxlJobInfoDao.pageListCountByGlueType(1, 1, 1, "SHELL");
+//		System.out.println(a);
+//
+//		System.out.println("==========");
 	}
 
+
+	@Test
+	public void pageList3(){
+		System.out.println("==========");
+		XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadById(41);
+		System.out.println(xxlJobInfo.getGlueSource());
+		System.out.println("=====");
+	}
 
 
 }

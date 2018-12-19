@@ -56,7 +56,7 @@
             <if test="describe != null and describe != ''">
                 AND t.describe like CONCAT(CONCAT('%', #{describe}), '%')
             </if>
-            <if test="type != null and describe != ''">
+            <if test="type != null and type != ''">
                 AND t.type = #{type}
             </if>
         </trim>
@@ -95,6 +95,11 @@
         WHERE t.id = #{id}
     </select>
 
+    <select id="fileNameExist" parameterType="java.util.HashMap" resultType="int">
+        SELECT count(1)
+        FROM XXL_JOB_QRTZ_TRIGGER_RESOURCE AS t
+        WHERE t.fileName = #{fileName}
+    </select>
 
 
 </mapper>

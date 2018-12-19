@@ -55,6 +55,10 @@ public class XxlJobInfo {
 
 	/** 资源ID，多个逗号分隔 **/
 	private String resourceId;
+
+	/** 资源ID，多个逗号分隔 **/
+	private String[] resourceIdArray;
+
 	/** 自定义参数，可能多个，格式为{"param1":"1","param2":"2"}，需要转化为JSONObject **/
 	private String customParam;
 
@@ -226,6 +230,14 @@ public class XxlJobInfo {
 		this.jobStatus = jobStatus;
 	}
 
+	public String[] getResourceIdArray() {
+		return resourceIdArray;
+	}
+
+	public void setResourceIdArray(String[] resourceIdArray) {
+		this.resourceIdArray = resourceIdArray;
+	}
+
 	public String getResourceId() {
 		return resourceId;
 	}
@@ -233,6 +245,4 @@ public class XxlJobInfo {
 	public void setResourceId(String resourceId) {
 		this.resourceId = resourceId;
 	}
-
-
 }

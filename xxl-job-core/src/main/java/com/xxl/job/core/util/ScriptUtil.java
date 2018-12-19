@@ -1,5 +1,6 @@
 package com.xxl.job.core.util;
 
+import com.xxl.job.core.log.XxlJobLogger;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
@@ -123,6 +124,7 @@ public class ScriptUtil {
             exec.setExitValues(null);
             exec.setStreamHandler(streamHandler);
             int exitValue = exec.execute(commandline);  // exit code: 0=success, 1=error
+            XxlJobLogger.log("<br> <br>");
             return exitValue;
         }
     }

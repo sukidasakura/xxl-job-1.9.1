@@ -1,5 +1,6 @@
 package com.xxl.job.admin.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.xxl.job.admin.core.enums.ExecutorFailStrategyEnum;
 import com.xxl.job.admin.core.model.*;
 import com.xxl.job.admin.core.route.ExecutorRouteStrategyEnum;
@@ -10,9 +11,12 @@ import com.xxl.job.admin.dao.*;
 import com.xxl.job.admin.service.XxlJobService;
 import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.biz.model.ReturnT;
+import com.xxl.job.core.biz.model.TriggerParam;
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.glue.GlueTypeEnum;
+import com.xxl.job.core.log.XxlJobFileAppender;
 import com.xxl.job.core.util.DateTool;
+import com.xxl.job.core.util.ScriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -24,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -504,6 +509,10 @@ public class XxlJobServiceImpl implements XxlJobService {
             // 通过执行器来终止该任务，主要是执行器那边的kill方法。
             ExecutorBiz executorBiz = XxlJobDynamicScheduler.getExecutorBiz(log.getExecutorAddress());
             runResult = executorBiz.kill(jobInfo.getId());
+            executorBiz.killPid(getTriggerParam(jobInfo.getId()));
+
+
+
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             runResult = new ReturnT<>(500, e.getMessage());
@@ -518,6 +527,43 @@ public class XxlJobServiceImpl implements XxlJobService {
         } else {
             return new ReturnT<>(500, runResult.getMsg());
         }
+    }
+
+
+    /**
+     *
+     * @param jobId
+     */
+    private TriggerParam getTriggerParam(int jobId){
+
+        TriggerParam triggerParam = new TriggerParam();
+
+        XxlJobInfo jobInfo = xxlJobInfoDao.loadById(jobId);
+
+        Map<String, byte[]> resources = new HashMap<>();
+        // 设置资源名和资源内容
+        if (StringUtils.isNotBlank(jobInfo.getResourceId())) {
+            String[] resourceIds = StringUtils.split(jobInfo.getResourceId(), ",");
+            for (String resourceIdItem : resourceIds) {
+                if (StringUtils.isNotBlank(resourceIdItem) && StringUtils.isNumeric(resourceIdItem)) {
+                    XxlJobResource xxlJobResource = xxlJobResourceDao.loadById(Integer.valueOf(resourceIdItem));
+                    resources.put(xxlJobResource.getFileName(), xxlJobResource.getContent());
+                }
+            }
+        }
+//        triggerParam.setJobId(jobInfo.getId());
+//        triggerParam.setExecutorHandler(jobInfo.getExecutorHandler());
+//        triggerParam.setExecutorParams(jobInfo.getExecutorParam());
+//        triggerParam.setExecutorBlockStrategy(jobInfo.getExecutorBlockStrategy());
+//        triggerParam.setGlueType(jobInfo.getGlueType());
+//        triggerParam.setGlueSource(jobInfo.getGlueSource());
+//        triggerParam.setGlueUpdatetime(jobInfo.getGlueUpdateTime());
+        // 自定义参数
+        triggerParam.setCustomParam(jobInfo.getCustomParam());
+        triggerParam.setGlueSource(jobInfo.getGlueSource());
+        triggerParam.setResources(resources);
+        triggerParam.setExecutorParams(jobInfo.getExecutorParam());
+        return triggerParam;
     }
 
 

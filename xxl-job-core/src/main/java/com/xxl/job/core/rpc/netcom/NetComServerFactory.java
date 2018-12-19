@@ -80,6 +80,10 @@ public class NetComServerFactory  {
 			FastClass serviceFastClass = FastClass.create(serviceClass);
 			FastMethod serviceFastMethod = serviceFastClass.getMethod(methodName, parameterTypes);
 
+			logger.info("serviceClass:" + serviceClass);
+			logger.info("methodName:" + methodName);
+			logger.info("parameters:" + parameters[0]);
+
 			// 拿到方法之后执行方法的invoke
 			// 通过调度中心发过来的参数，以及执行器的处理逻辑，我们有理由可以得出此时是执行的是ExecutorBizImpl中的run方法
 			Object result = serviceFastMethod.invoke(serviceBean, parameters);

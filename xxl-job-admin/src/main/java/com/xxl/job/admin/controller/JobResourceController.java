@@ -1,6 +1,7 @@
 package com.xxl.job.admin.controller;
 
 import com.xxl.job.admin.core.model.XxlJobResource;
+import com.xxl.job.admin.dao.XxlJobInfoDao;
 import com.xxl.job.admin.dao.XxlJobResourceDao;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.enums.ResourceTypeEnum;
@@ -25,8 +26,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/jobResource")
 public class JobResourceController {
+
     @Resource
     public XxlJobResourceDao xxlJobResourceDao;
+
+    @Resource
+    public XxlJobInfoDao xxlJobInfoDao;
 
     /**
      * 列出所有资源
@@ -78,44 +83,6 @@ public class JobResourceController {
         return maps;
     }
 
-//    /**
-//     * 新增上传资源
-//     * @param request
-//     * @param response
-//     * @param file 文件
-//     * @param describe 文件描述
-//     * @return
-//     * @throws IOException
-//     */
-//    @RequestMapping(value = "/upload", method = RequestMethod.POST)
-//    @ResponseBody
-//    public ReturnT<String> uploadResource(HttpServletRequest request,
-//                                          HttpServletResponse response,
-//                                          @RequestParam(value = "file")MultipartFile file,
-//                                          @RequestParam(value = "describe", required = false)String describe) throws IOException {
-//
-//        // 上传的文件名file.jar
-//        String originName = file.getOriginalFilename();
-//        // 后缀名
-//        String _suffix = originName.substring(originName.lastIndexOf(".") + 1, originName.length());
-//        // 支持类型：jar, py, txt, sh, sql
-//        ResourceTypeEnum resourceType = ResourceTypeEnum.match(_suffix.toUpperCase(), null);
-//        if (resourceType == null){
-//            return new ReturnT<>(500, "上传文件格式有误");
-//        }
-//        XxlJobResource xxlJobResource = new XxlJobResource();
-//        byte[] bytes = file.getBytes();
-//        xxlJobResource.setFileName(originName); // 文件名
-//        xxlJobResource.setDescribe(describe); // 文件描述
-//        xxlJobResource.setContent(bytes); // 文件内容
-//        xxlJobResource.setAddTime(DateTool.convertDateTime(new Date())); // 添加时间
-//        xxlJobResource.setType(resourceType.getSuffix());
-//
-//        int result = xxlJobResourceDao.upload(xxlJobResource);
-//        return (result > 0) ? ReturnT.SUCCESS : ReturnT.FAIL;
-//
-//    }
-
     /**
      * 新增上传资源
      * @return
@@ -124,6 +91,13 @@ public class JobResourceController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
     public ReturnT<String> uploadResource(@RequestBody XxlJobResource xxlJobResource) throws IOException {
+
+        if (xxlJobResourceDao.fileNameExist(xxlJobResource.getFileName()) != 0){
+            ReturnT returnT = new ReturnT();
+            returnT.setCode(500);
+            returnT.setMsg("文件已存在, 重新输入文件描述");
+            return returnT;
+        }
 
         int result = xxlJobResourceDao.upload(xxlJobResource);
         return (result > 0) ? ReturnT.SUCCESS : ReturnT.FAIL;
@@ -138,7 +112,20 @@ public class JobResourceController {
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @ResponseBody
     public ReturnT<String> delete(@ModelAttribute("id")int id){
+
+        ReturnT returnT = new ReturnT();
+
+        List<Integer> usedResources = xxlJobInfoDao.getUsedResources();
+        for (int item : usedResources){
+            if (item == id) { // 如果资源是被使用中的话, 不允许删除
+                returnT.setCode(500);
+                returnT.setMsg("资源使用中, 不允许删除");
+                return returnT;
+            }
+        }
+
         int result = xxlJobResourceDao.delete(id);
         return (result > 0) ? ReturnT.SUCCESS : ReturnT.FAIL;
     }
+
 }

@@ -8,8 +8,9 @@ CREATE TABLE XXL_JOB_QRTZ_TRIGGER_RESOURCE
   `describe` VARCHAR(255) NOT NULL COMMENT '资源描述',
   `type` VARCHAR(200) NOT NULL COMMENT '资源类型后缀',
   `addTime` DATETIME DEFAULT NULL COMMENT '添加时间',
-  `content` MEDIUMBLOB COMMENT '资源内容',
-  PRIMARY KEY (`id`)
+  `content` MEDIUMBLOB DEFAULT NULL COMMENT '资源内容',
+  `used` int(5) NOT NULL DEFAULT 0 COMMENT '是否使用中 >1为使用中 0为未使用',
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE XXL_JOB_QRTZ_JOB_DETAILS
@@ -223,7 +224,7 @@ CREATE TABLE XXL_JOB_QRTZ_TRIGGER_REGISTRY (
 CREATE TABLE `XXL_JOB_QRTZ_TRIGGER_GROUP` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `app_name` varchar(64) NOT NULL COMMENT '执行器AppName',
-  `title` varchar(12) NOT NULL COMMENT '执行器名称',
+  `title` varchar(12) NOT NULL COMMENT '执行器描述',
   `order` tinyint(4) NOT NULL DEFAULT '0' COMMENT '排序',
   `address_type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '执行器地址类型：0=自动注册、1=手动录入',
   `address_list` varchar(512) DEFAULT NULL COMMENT '执行器地址列表，多地址逗号分隔',

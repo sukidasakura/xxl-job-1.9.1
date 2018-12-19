@@ -24,20 +24,22 @@ public class DemoJobHandlerTest {
 
         // trigger data
         TriggerParam triggerParam = new TriggerParam();
-        triggerParam.setJobId(1);
+        triggerParam.setJobId(54);
+        triggerParam.setCustomParam(null);
         triggerParam.setExecutorHandler(jobHandler);
         triggerParam.setExecutorParams(params);
-        triggerParam.setExecutorBlockStrategy(ExecutorBlockStrategyEnum.COVER_EARLY.name());
-        triggerParam.setGlueType(GlueTypeEnum.BEAN.name());
-        triggerParam.setGlueSource(null);
+        triggerParam.setGlueSource("#!/bin/bash\n" +
+                "java -cp {Test_测试资源1，勿删！.jar} ${className} ${readpath} ${writepath}");
 //        triggerParam.setGlueUpdatetime(DateUtils.convertDateTime(new Date()));
         triggerParam.setLogId(1);
 //        triggerParam.setLogDateTim(System.currentTimeMillis());
 
         // do remote trigger
         String accessToken = null;
-        ExecutorBiz executorBiz = (ExecutorBiz) new NetComClientProxy(ExecutorBiz.class, "127.0.0.1:9999", null).getObject();
-        ReturnT<String> runResult = executorBiz.run(triggerParam);
+        ExecutorBiz executorBiz = (ExecutorBiz) new NetComClientProxy(ExecutorBiz.class, "http://10.10.77.136:9998", null).getObject();
+        ReturnT returnT = executorBiz.killPid(triggerParam);
+        System.out.println(returnT.getCode());
+//        ReturnT<String> runResult = executorBiz.run(triggerParam);
     }
 
 }

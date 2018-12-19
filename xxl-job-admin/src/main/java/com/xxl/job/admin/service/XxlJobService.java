@@ -56,7 +56,7 @@ public interface XxlJobService {
 	 * @param GlueType
 	 * @return
 	 */
-	public Map<String, Object> pageListByGlueType(int start, int length, int jobGroup, String GlueType);
+	public Map<String, Object> pageListByGlueType(int start, int length, int jobGroup, String glueType);
 
 	/**
 	 * add job "新增任务"

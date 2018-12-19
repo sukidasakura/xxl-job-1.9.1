@@ -30,6 +30,10 @@ public interface ExecutorBiz {
      */
     public ReturnT<String> kill(int jobId);
 
+
+    public ReturnT<String> killPid(TriggerParam triggerParam);
+
+
     /**
      * log 获取Rolling Log
      * @param logDateTim
