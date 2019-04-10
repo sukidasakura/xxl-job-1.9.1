@@ -123,5 +123,24 @@ public class XxlJobInfoDaoTest {
 		System.out.println("=====");
 	}
 
+	@Test
+	public void loadByNameTest(){
+		System.out.println("==========");
+		XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadByName("test_deletehisfiles1111");
+		System.out.println(JSON.toJSONString(xxlJobInfo));
+		System.out.println("=====");
+	}
+
+	@Test
+	public void isJobExistTest(){
+		System.out.println("==========");
+		if (xxlJobInfoDao.loadByName("chaizezhao") != null){ // 任务已存在
+			System.out.println("true");
+		} else {
+			System.out.println("false");
+		}
+		System.out.println("=====");
+	}
+
 
 }

@@ -101,6 +101,20 @@ public class XxlJobServiceImpl implements XxlJobService {
     }
 
     /**
+     * 任务是否存在
+     * @param jobName
+     * @return
+     */
+    @Override
+    public boolean isJobExist(String jobName) {
+        if (xxlJobInfoDao.loadByName(jobName) != null){ // 任务已存在
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * 载入任务信息
      *
      * @param id
@@ -187,7 +201,9 @@ public class XxlJobServiceImpl implements XxlJobService {
 //		if (!CronExpression.isValidExpression(jobInfo.getJobCron())) {
 //			return new ReturnT<>(ReturnT.FAIL_CODE, "Cron格式非法" );
 //		}
-
+        if (xxlJobInfoDao.loadByName(jobInfo.getJobName()) != null){
+            return new ReturnT<>(500, "任务名已存在");
+        }
 
         // 添加任务时，设置默认的编辑代码。 fix "\r" in shell
         if (GlueTypeEnum.SHELL.name().equals(jobInfo.getGlueType())) {
@@ -317,6 +333,7 @@ public class XxlJobServiceImpl implements XxlJobService {
         // fresh quartz
         String qz_group = String.valueOf(exists_jobInfo.getJobGroup());
         String qz_name = String.valueOf(exists_jobInfo.getId());
+
         // 若在更新任务时修改了执行器job_group，需要把quartz中之前的任务删除，重新添加，再进行调度
         if (oldGroup != jobInfo.getJobGroup()) {
             try {
@@ -345,8 +362,6 @@ public class XxlJobServiceImpl implements XxlJobService {
         return ReturnT.FAIL;
 
     }
-
-
 
 
     /**

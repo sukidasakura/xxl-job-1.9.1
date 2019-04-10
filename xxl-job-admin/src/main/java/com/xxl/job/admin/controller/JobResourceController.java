@@ -91,16 +91,25 @@ public class JobResourceController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
     public ReturnT<String> uploadResource(@RequestBody XxlJobResource xxlJobResource) throws IOException {
+        ReturnT returnT = new ReturnT();
 
         if (xxlJobResourceDao.fileNameExist(xxlJobResource.getFileName()) != 0){
-            ReturnT returnT = new ReturnT();
             returnT.setCode(500);
-            returnT.setMsg("文件已存在, 重新输入文件描述");
+            returnT.setMsg("文件已存在, 重新选择文件");
             return returnT;
         }
 
         int result = xxlJobResourceDao.upload(xxlJobResource);
-        return (result > 0) ? ReturnT.SUCCESS : ReturnT.FAIL;
+        if (result > 0){
+            int resourceId = xxlJobResourceDao.getIdByFileName(xxlJobResource.getFileName()).getId();
+            returnT.setCode(ReturnT.SUCCESS_CODE);
+            returnT.setMsg("新增成功，返回resourceId");
+            returnT.setContent(resourceId);
+        } else {
+            returnT.setCode(ReturnT.FAIL_CODE);
+            returnT.setMsg("新增失败");
+        }
+        return returnT;
 
     }
 
@@ -127,5 +136,31 @@ public class JobResourceController {
         int result = xxlJobResourceDao.delete(id);
         return (result > 0) ? ReturnT.SUCCESS : ReturnT.FAIL;
     }
+
+    /**
+     * 删除资源, 尚未考虑资源是否在被使用
+     * @param fileName
+     * @return
+     */
+    @RequestMapping(value = "/deleteByName", method = RequestMethod.POST)
+    @ResponseBody
+    public ReturnT<String> deleteByName(@ModelAttribute("fileName")String fileName){
+
+        ReturnT returnT = new ReturnT();
+
+        int resourceId = xxlJobResourceDao.getIdByFileName(fileName).getId();
+        List<Integer> usedResources = xxlJobInfoDao.getUsedResources();
+        for (int item : usedResources){
+            if (item == resourceId) { // 如果资源是被使用中的话, 不允许删除
+                returnT.setCode(500);
+                returnT.setMsg("资源使用中, 不允许删除");
+                return returnT;
+            }
+        }
+
+        int result = xxlJobResourceDao.delete(resourceId);
+        return (result > 0) ? ReturnT.SUCCESS : ReturnT.FAIL;
+    }
+
 
 }

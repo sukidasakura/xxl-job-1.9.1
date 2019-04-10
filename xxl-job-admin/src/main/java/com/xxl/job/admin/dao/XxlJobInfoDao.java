@@ -1,6 +1,7 @@
 package com.xxl.job.admin.dao;
 
 import com.xxl.job.admin.core.model.XxlJobInfo;
+import com.xxl.job.admin.core.schedule.XxlJobDynamicScheduler;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -96,6 +97,9 @@ public interface XxlJobInfoDao {
 
 	// 根据任务id加载任务信息
 	XxlJobInfo loadById(@Param("id") int id);
+
+	// 根据任务名称加载任务信息
+	XxlJobInfo loadByName(@Param("jobName") String jobName);
 
 	// 更新任务信息
 	int update(XxlJobInfo item);

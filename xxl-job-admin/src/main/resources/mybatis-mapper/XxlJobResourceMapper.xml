@@ -101,5 +101,10 @@
         WHERE t.fileName = #{fileName}
     </select>
 
+    <select id="getIdByFileName" parameterType="java.util.HashMap" resultMap="XxlJobResource">
+        SELECT <include refid="Base_Column_List" />
+        FROM XXL_JOB_QRTZ_TRIGGER_RESOURCE AS t
+        WHERE t.fileName = #{fileName}
+    </select>
 
 </mapper>

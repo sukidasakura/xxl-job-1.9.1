@@ -1,5 +1,6 @@
 package com.xxl.job.admin.dao;
 
+import com.alibaba.fastjson.JSON;
 import com.xxl.job.core.biz.model.ReturnT;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,5 +48,15 @@ public class XxlJobResourceDaoTest {
 
         int result = xxlJobResourceDao.delete(id);
     }
+
+    @Test
+    public void getIdByFileName(){
+
+        System.out.println("====");
+        System.out.println(JSON.toJSONString(xxlJobResourceDao.getIdByFileName("data_crud_impl-1.1.00.170701-SNAPSHOT_asa.jar")));
+        System.out.println("====");
+
+    }
+
 
 }

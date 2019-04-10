@@ -14,6 +14,8 @@ public class XxlJobInfo {
 
 	/** 执行器主键ID (JobKey.group)**/
 	private int jobGroup;
+	/** 所属文件夹ID **/
+	private int folderId;
 	/** 任务执行Cron表达式 **/
 	private String jobCron;
 	/** 任务名称 **/
@@ -39,6 +41,8 @@ public class XxlJobInfo {
 	/** 失败处理策略 **/
 	private String executorFailStrategy;
 
+	/** 任务类型ID，与glueType对应**/
+	private int typeId;
 	/** glue类型 **/
 	private String glueType;
 	/** glue源代码 **/
@@ -244,5 +248,21 @@ public class XxlJobInfo {
 
 	public void setResourceId(String resourceId) {
 		this.resourceId = resourceId;
+	}
+
+	public int getFolderId() {
+		return folderId;
+	}
+
+	public void setFolderId(int folderId) {
+		this.folderId = folderId;
+	}
+
+	public int getTypeId() {
+		return typeId;
+	}
+
+	public void setTypeId(int typeId) {
+		this.typeId = typeId;
 	}
 }

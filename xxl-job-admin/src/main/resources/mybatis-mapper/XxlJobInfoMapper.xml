@@ -31,6 +31,8 @@
 		<result column="child_jobid" property="childJobId" />
 		<result column="custom_param" property="customParam" />
 		<result column="resource_id" property="resourceId" />
+		<result column="type_id" property="typeId" />
+		<result column="folder_id" property="folderId" />
 	</resultMap>
 
 	<sql id="Base_Column_List">
@@ -54,7 +56,9 @@
 		t.glue_updatetime,
 		t.child_jobid,
 		t.custom_param,
-		t.resource_id
+		t.resource_id,
+		t.type_id,
+		t.folder_id
 	</sql>
 
 
@@ -169,7 +173,9 @@
 			glue_updatetime,
 			child_jobid,
 		    custom_param,
-		    resource_id
+		    resource_id,
+		    folder_id,
+			type_id
 		) VALUES (
 			#{jobGroup},
 			#{jobCron},
@@ -190,7 +196,9 @@
 		    #{glueUpdateTime},
 			#{childJobId},
 		    #{customParam},
-		    #{resourceId}
+		    #{resourceId},
+			#{folderId},
+			#{typeId}
 		);
 		<!--<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
 			SELECT LAST_INSERT_ID()
@@ -202,6 +210,12 @@
 		SELECT <include refid="Base_Column_List" />
 		FROM XXL_JOB_QRTZ_TRIGGER_INFO AS t
 		WHERE t.id = #{id}
+	</select>
+
+	<select id="loadByName" parameterType="java.util.HashMap" resultMap="XxlJobInfo">
+		SELECT <include refid="Base_Column_List" />
+		FROM XXL_JOB_QRTZ_TRIGGER_INFO AS t
+		WHERE t.job_name = #{jobName}
 	</select>
 	
 	<update id="update" parameterType="com.xxl.job.admin.core.model.XxlJobInfo" >

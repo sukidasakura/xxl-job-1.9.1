@@ -51,4 +51,6 @@ public interface XxlJobResourceDao {
     // 查看文件名是否存在
     int fileNameExist(@Param("fileName") String fileName);
 
+    // 根据文件名加载资源信息
+    XxlJobResource getIdByFileName(@Param("fileName") String fileName);
 }

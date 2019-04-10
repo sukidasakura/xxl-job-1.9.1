@@ -93,6 +93,16 @@ public class JobInfoController {
 	}
 
 
+	/**
+	 * 任务是否存在
+	 * @return
+	 */
+	@RequestMapping(value = "isJobExist")
+	@ResponseBody
+	public boolean isJobExist(String jobName){
+		return xxlJobService.isJobExist(jobName);
+	}
+
 	@RequestMapping("/restAdd")
 	@ResponseBody
 	public ReturnT<String> restAdd(@RequestBody XxlJobInfo jobInfo) {

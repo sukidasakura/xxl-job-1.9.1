@@ -36,6 +36,13 @@ public interface XxlJobService {
 	public long counts();
 
 	/**
+	 * 任务是否存在
+	 * @param jobName
+	 * @return
+	 */
+	public boolean isJobExist(String jobName);
+
+	/**
 	 * page list
 	 *
 	 * @param start

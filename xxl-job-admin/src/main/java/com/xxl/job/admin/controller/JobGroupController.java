@@ -263,12 +263,12 @@ public class JobGroupController {
         // valid
         int count = xxlJobInfoDao.pageListCount(0, 10, id, null, null);
         if (count > 0) {
-            return new ReturnT<String>(500, I18nUtil.getString("jobgroup_del_limit_0"));
+            return new ReturnT<String>(500, I18nUtil.getString("jobgroup_del_limit_0")); //该执行器使用中
         }
 
         List<XxlJobGroup> allList = xxlJobGroupDao.findAll();
         if (allList.size() == 1) {
-            return new ReturnT<String>(500, I18nUtil.getString("jobgroup_del_limit_1"));
+            return new ReturnT<String>(500, I18nUtil.getString("jobgroup_del_limit_1")); // 拒绝删除, 系统至少保留一个执行器
         }
 
         int ret = xxlJobGroupDao.remove(id);
