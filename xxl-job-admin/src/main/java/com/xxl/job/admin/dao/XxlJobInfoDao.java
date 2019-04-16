@@ -119,4 +119,6 @@ public interface XxlJobInfoDao {
 	// 筛选使用中的资源
 	List<Integer> getUsedResources();
 
+	int findMaxId();
+
 }

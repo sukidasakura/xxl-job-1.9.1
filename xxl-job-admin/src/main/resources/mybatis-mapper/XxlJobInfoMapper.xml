@@ -154,6 +154,7 @@
 
 	<insert id="save" parameterType="com.xxl.job.admin.core.model.XxlJobInfo" useGeneratedKeys="true" keyProperty="id" >
 		INSERT INTO XXL_JOB_QRTZ_TRIGGER_INFO (
+			id,
 			job_group,
 			job_cron,
 		    job_name,
@@ -177,6 +178,7 @@
 		    folder_id,
 			type_id
 		) VALUES (
+			#{id},
 			#{jobGroup},
 			#{jobCron},
 		    #{jobName},
@@ -271,6 +273,11 @@
 		SELECT DISTINCT t.resource_id
 		FROM XXL_JOB_QRTZ_TRIGGER_INFO AS t
 		WHERE resource_id > 0
+	</select>
+
+	<select id="findMaxId" parameterType="java.lang.Integer" resultType="int">
+		SELECT IFNULL(Max(id), 0)
+		FROM XXL_JOB_QRTZ_TRIGGER_INFO
 	</select>
 
 </mapper>

@@ -71,12 +71,14 @@
 
     <insert id="upload" parameterType="com.xxl.job.admin.core.model.XxlJobResource" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO XXL_JOB_QRTZ_TRIGGER_RESOURCE(
+          `id`,
           `fileName`,
           `describe`,
           `type`,
           `addTime`,
           `content`
         ) VALUES (
+            #{id},
             #{fileName},
             #{describe},
             #{type},
@@ -105,6 +107,11 @@
         SELECT <include refid="Base_Column_List" />
         FROM XXL_JOB_QRTZ_TRIGGER_RESOURCE AS t
         WHERE t.fileName = #{fileName}
+    </select>
+
+    <select id="findMaxId" parameterType="java.lang.Integer" resultType="int">
+        SELECT IFNULL(Max(id), 0)
+        FROM XXL_JOB_QRTZ_TRIGGER_RESOURCE
     </select>
 
 </mapper>

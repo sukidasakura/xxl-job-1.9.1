@@ -141,9 +141,11 @@
 	
 	<insert id="save" parameterType="com.xxl.job.admin.core.model.XxlJobLog" useGeneratedKeys="true" keyProperty="id" >
 		INSERT INTO XXL_JOB_QRTZ_TRIGGER_LOG (
+			`id`,
 			`job_group`,
 			`job_id`
 		) VALUES (
+			#{id},
 			#{jobGroup},
 			#{jobId}
 		);
@@ -238,6 +240,11 @@
 		WHERE job_id = #{jobId}
 		ORDER BY id DESC
 		LIMIT 1
+	</select>
+
+	<select id="findMaxId" parameterType="java.lang.Integer" resultType="int">
+		SELECT IFNULL(Max(id), 0)
+		FROM XXL_JOB_QRTZ_TRIGGER_LOG
 	</select>
 	
 </mapper>

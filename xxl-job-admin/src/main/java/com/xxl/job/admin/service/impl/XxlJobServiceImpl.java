@@ -31,6 +31,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * core job action for xxl-job
@@ -51,6 +52,8 @@ public class XxlJobServiceImpl implements XxlJobService {
     private XxlJobLogGlueDao xxlJobLogGlueDao;
     @Resource
     public XxlJobResourceDao xxlJobResourceDao;
+
+    private static ReentrantLock lock = new ReentrantLock();
 
     @Override
     public List<XxlJobInfo> findAll(int start, int length) {
@@ -94,20 +97,22 @@ public class XxlJobServiceImpl implements XxlJobService {
 
     /**
      * 获取任务的数量
+     *
      * @return
      */
-    public long counts(){
+    public long counts() {
         return xxlJobInfoDao.counts();
     }
 
     /**
      * 任务是否存在
+     *
      * @param jobName
      * @return
      */
     @Override
     public boolean isJobExist(String jobName) {
-        if (xxlJobInfoDao.loadByName(jobName) != null){ // 任务已存在
+        if (xxlJobInfoDao.loadByName(jobName) != null) { // 任务已存在
             return true;
         } else {
             return false;
@@ -201,7 +206,7 @@ public class XxlJobServiceImpl implements XxlJobService {
 //		if (!CronExpression.isValidExpression(jobInfo.getJobCron())) {
 //			return new ReturnT<>(ReturnT.FAIL_CODE, "Cron格式非法" );
 //		}
-        if (xxlJobInfoDao.loadByName(jobInfo.getJobName()) != null){
+        if (xxlJobInfoDao.loadByName(jobInfo.getJobName()) != null) {
             return new ReturnT<>(500, "任务名已存在");
         }
 
@@ -226,9 +231,18 @@ public class XxlJobServiceImpl implements XxlJobService {
         jobInfo.setAddTime(DateTool.convertDateTime(new Date()));
 
         // add in db 添加到数据库中
-        xxlJobInfoDao.save(jobInfo);
-        if (jobInfo.getId() < 1) { // 新增任务失败
-            return new ReturnT<String>(ReturnT.FAIL_CODE, "新增任务失败");
+        try {
+            lock.lock();
+            int id = xxlJobInfoDao.findMaxId();
+            jobInfo.setId(id + 1);
+            xxlJobInfoDao.save(jobInfo);
+            if (jobInfo.getId() < 1) { // 新增任务失败
+                return new ReturnT<>(ReturnT.FAIL_CODE, "新增任务失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
         }
 
         // add in quartz 添加到quartz中
@@ -252,9 +266,6 @@ public class XxlJobServiceImpl implements XxlJobService {
         }
 
     }
-
-
-
 
 
     /**
@@ -527,7 +538,6 @@ public class XxlJobServiceImpl implements XxlJobService {
             executorBiz.killPid(getTriggerParam(jobInfo.getId()));
 
 
-
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             runResult = new ReturnT<>(500, e.getMessage());
@@ -546,10 +556,9 @@ public class XxlJobServiceImpl implements XxlJobService {
 
 
     /**
-     *
      * @param jobId
      */
-    private TriggerParam getTriggerParam(int jobId){
+    private TriggerParam getTriggerParam(int jobId) {
 
         TriggerParam triggerParam = new TriggerParam();
 
@@ -753,12 +762,12 @@ public class XxlJobServiceImpl implements XxlJobService {
 
     /**
      * 获取最新添加的任务
+     *
      * @return
      */
     public XxlJobInfo getNewestJob() {
         return xxlJobInfoDao.getNewestJob();
     }
-
 
 
     /**
@@ -840,9 +849,19 @@ public class XxlJobServiceImpl implements XxlJobService {
 
         jobInfo.setAddTime(DateTool.convertDateTime(new Date()));
         // add in db 添加到数据库中
-        xxlJobInfoDao.save(jobInfo);
-        if (jobInfo.getId() < 1) { // 新增任务失败
-            return new ReturnT<String>(ReturnT.FAIL_CODE, (I18nUtil.getString("jobinfo_field_add") + I18nUtil.getString("system_fail")));
+
+        try {
+            lock.lock();
+            int id = xxlJobInfoDao.findMaxId();
+            jobInfo.setId(id + 1);
+            xxlJobInfoDao.save(jobInfo);
+            if (jobInfo.getId() < 1) { // 新增任务失败
+                return new ReturnT<>(ReturnT.FAIL_CODE, "新增任务失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
         }
 
         // add in quartz 添加到quartz中
@@ -864,7 +883,6 @@ public class XxlJobServiceImpl implements XxlJobService {
             return new ReturnT<String>(ReturnT.FAIL_CODE, (I18nUtil.getString("jobinfo_field_add") + I18nUtil.getString("system_fail")) + ":" + e.getMessage()); //新增任务失败
         }
     }
-
 
 
     /**

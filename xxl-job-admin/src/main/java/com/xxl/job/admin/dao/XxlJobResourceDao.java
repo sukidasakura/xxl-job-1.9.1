@@ -53,4 +53,6 @@ public interface XxlJobResourceDao {
 
     // 根据文件名加载资源信息
     XxlJobResource getIdByFileName(@Param("fileName") String fileName);
+
+    int findMaxId();
 }

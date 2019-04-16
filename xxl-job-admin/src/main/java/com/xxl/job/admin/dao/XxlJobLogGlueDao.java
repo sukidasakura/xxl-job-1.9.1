@@ -22,4 +22,6 @@ public interface XxlJobLogGlueDao {
 
 	public int deleteByJobId(@Param("jobId") int jobId);
 
+	int findMaxId();
+
 }

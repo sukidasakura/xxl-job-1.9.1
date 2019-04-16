@@ -22,6 +22,15 @@ public class XxlJobLogDaoTest {
     private XxlJobLogDao xxlJobLogDao;
 
     @Test
+    public void findMaxId(){
+
+        System.out.println("====");
+        System.out.println(xxlJobLogDao.findMaxId());
+        System.out.println("====");
+
+    }
+
+    @Test
     public void test(){
 
 

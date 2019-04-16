@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * xxl-job trigger
@@ -37,6 +38,7 @@ import java.util.Map;
  */
 public class XxlJobTrigger {
     private static Logger logger = LoggerFactory.getLogger(XxlJobTrigger.class);
+    private static ReentrantLock lock = new ReentrantLock();
 
     /**
      * trigger job
@@ -88,7 +90,18 @@ public class XxlJobTrigger {
                 XxlJobLog jobLog = new XxlJobLog();
                 jobLog.setJobGroup(jobInfo.getJobGroup());
                 jobLog.setJobId(jobInfo.getId());
-                XxlJobDynamicScheduler.xxlJobLogDao.save(jobLog);
+
+                try {
+                    lock.lock();
+                    int id = XxlJobDynamicScheduler.xxlJobLogDao.findMaxId();
+                    jobLog.setId(id + 1);
+                    XxlJobDynamicScheduler.xxlJobLogDao.save(jobLog);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    lock.unlock();
+                }
+
                 logger.debug(">>>>>>>>>>> xxl-job trigger start, jobId:{}", jobLog.getId());
 
                 // 2、prepare trigger-info
@@ -179,7 +192,18 @@ public class XxlJobTrigger {
             XxlJobLog jobLog = new XxlJobLog();
             jobLog.setJobGroup(jobInfo.getJobGroup());
             jobLog.setJobId(jobInfo.getId());
-            XxlJobDynamicScheduler.xxlJobLogDao.save(jobLog);
+
+            try {
+                lock.lock();
+                int id = XxlJobDynamicScheduler.xxlJobLogDao.findMaxId();
+                jobLog.setId(id + 1);
+                XxlJobDynamicScheduler.xxlJobLogDao.save(jobLog);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                lock.unlock();
+            }
+
             logger.debug(">>>>>>>>>>> xxl-job trigger start, jobId:{}", jobLog.getId());
 
             // 2、prepare trigger-info

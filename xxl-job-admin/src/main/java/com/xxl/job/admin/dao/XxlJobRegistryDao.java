@@ -18,7 +18,8 @@ public interface XxlJobRegistryDao {
                        @Param("registryKey") String registryKey,
                        @Param("registryValue") String registryValue);
 
-    int registrySave(@Param("registryGroup") String registryGroup,
+    int registrySave(@Param("id") int id,
+                     @Param("registryGroup") String registryGroup,
                      @Param("registryKey") String registryKey,
                      @Param("registryValue") String registryValue,
                      @Param("updateTime")String updateTime);
@@ -26,4 +27,6 @@ public interface XxlJobRegistryDao {
     int registryDelete(@Param("registryGroup") String registGroup,
                        @Param("registryKey") String registryKey,
                        @Param("registryValue") String registryValue);
+
+    int findMaxId();
 }

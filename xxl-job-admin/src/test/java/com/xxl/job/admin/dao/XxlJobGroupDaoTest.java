@@ -18,6 +18,15 @@ public class XxlJobGroupDaoTest {
     private XxlJobGroupDao xxlJobGroupDao;
 
     @Test
+    public void findMaxId(){
+
+        System.out.println("====");
+        System.out.println(xxlJobGroupDao.findMaxId());
+        System.out.println("====");
+
+    }
+
+    @Test
     public void test(){
 
 //        System.out.println(xxlJobGroupDao.loadById(1));

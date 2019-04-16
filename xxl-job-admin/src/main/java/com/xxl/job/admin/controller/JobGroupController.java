@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 执行器
@@ -29,6 +30,8 @@ public class JobGroupController {
     public XxlJobInfoDao xxlJobInfoDao;
     @Resource
     public XxlJobGroupDao xxlJobGroupDao;
+
+    private static ReentrantLock lock = new ReentrantLock();
 
     @RequestMapping
     public String index(Model model) {
@@ -129,7 +132,17 @@ public class JobGroupController {
             }
         }
 
-        int ret = xxlJobGroupDao.save(xxlJobGroup);
+        int ret = 0;
+        try {
+            lock.lock();
+            int id = xxlJobGroupDao.findMaxId();
+            xxlJobGroup.setId(id + 1);
+            ret = xxlJobGroupDao.save(xxlJobGroup);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
         return (ret > 0) ? ReturnT.SUCCESS : ReturnT.FAIL;
     }
 
@@ -174,7 +187,17 @@ public class JobGroupController {
             }
         }
 
-        int ret = xxlJobGroupDao.save(xxlJobGroup);
+        int ret = 0;
+        try {
+            lock.lock();
+            int id = xxlJobGroupDao.findMaxId();
+            xxlJobGroup.setId(id + 1);
+            ret = xxlJobGroupDao.save(xxlJobGroup);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
         return (ret > 0) ? ReturnT.SUCCESS : ReturnT.FAIL;
     }
 

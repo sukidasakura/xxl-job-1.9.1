@@ -17,6 +17,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @Description: 资源管理
@@ -33,30 +37,35 @@ public class JobResourceController {
     @Resource
     public XxlJobInfoDao xxlJobInfoDao;
 
+    private static ReentrantLock lock = new ReentrantLock();
+
     /**
      * 列出所有资源
+     *
      * @param
      * @return
      */
     @RequestMapping(value = "/findAll", method = RequestMethod.POST)
-    public List<XxlJobResource> findAll(@RequestParam(required = false, defaultValue = "0")int start,
-                                        @RequestParam(required = false, defaultValue = "10")int length){
+    public List<XxlJobResource> findAll(@RequestParam(required = false, defaultValue = "0") int start,
+                                        @RequestParam(required = false, defaultValue = "10") int length) {
         return xxlJobResourceDao.findAll(start, length);
     }
 
     /**
      * 获取资源的数量
+     *
      * @return
      */
     @RequestMapping(value = "counts", method = RequestMethod.GET)
     @ResponseBody
-    public long counts(){
+    public long counts() {
         return xxlJobResourceDao.counts();
     }
 
 
     /**
      * 根据资源名称、资源描述、资源类型、每页记录数、第几页来查找符合条件的资源列表
+     *
      * @param start
      * @param length
      * @param fileName
@@ -65,11 +74,11 @@ public class JobResourceController {
      * @return
      */
     @RequestMapping("/pageList")
-    public Map<String, Object> pageList(@RequestParam(required = false, defaultValue = "0")int start,
-                                        @RequestParam(required = false, defaultValue = "10")int length,
+    public Map<String, Object> pageList(@RequestParam(required = false, defaultValue = "0") int start,
+                                        @RequestParam(required = false, defaultValue = "10") int length,
                                         String fileName,
                                         String describe,
-                                        String type){
+                                        String type) {
         // page list
         List<XxlJobResource> list = xxlJobResourceDao.pageList(start, length, fileName, describe, type);
         int list_count = xxlJobResourceDao.pageListCount(start, length, fileName, describe, type);
@@ -85,6 +94,7 @@ public class JobResourceController {
 
     /**
      * 新增上传资源
+     *
      * @return
      * @throws IOException
      */
@@ -93,14 +103,26 @@ public class JobResourceController {
     public ReturnT<String> uploadResource(@RequestBody XxlJobResource xxlJobResource) throws IOException {
         ReturnT returnT = new ReturnT();
 
-        if (xxlJobResourceDao.fileNameExist(xxlJobResource.getFileName()) != 0){
+        if (xxlJobResourceDao.fileNameExist(xxlJobResource.getFileName()) != 0) {
             returnT.setCode(500);
             returnT.setMsg("文件已存在, 重新选择文件");
             return returnT;
         }
 
-        int result = xxlJobResourceDao.upload(xxlJobResource);
-        if (result > 0){
+        int result = 0;
+        try {
+            lock.lock();
+            int id = xxlJobResourceDao.findMaxId();
+            xxlJobResource.setId(id + 1);
+            result = xxlJobResourceDao.upload(xxlJobResource);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+
+
+        if (result > 0) {
             int resourceId = xxlJobResourceDao.getIdByFileName(xxlJobResource.getFileName()).getId();
             returnT.setCode(ReturnT.SUCCESS_CODE);
             returnT.setMsg("新增成功，返回resourceId");
@@ -113,19 +135,77 @@ public class JobResourceController {
 
     }
 
+
+//    // 用多线程的方法来执行
+//    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+//    @ResponseBody
+//    public ReturnT<String> uploadResource(@RequestBody XxlJobResource xxlJobResource) throws IOException {
+//        ReturnT returnT = new ReturnT();
+//
+//        if (xxlJobResourceDao.fileNameExist(xxlJobResource.getFileName()) != 0){
+//            returnT.setCode(500);
+//            returnT.setMsg("文件已存在, 重新选择文件");
+//            return returnT;
+//        }
+//
+//
+//        /////////////////////////////////////
+//        FutureTask<Integer> task =
+//                new FutureTask<>(new UploadThread(xxlJobResource));
+//        Thread thread = new Thread(task);
+//
+//        // 等待15s的时间，若线程还未返回结果，则认为执行线程已阻塞。
+//        try {
+//            thread.start();
+//            int result = task.get(15, TimeUnit.SECONDS);
+//            if (result > 0){
+//                int resourceId = xxlJobResourceDao.getIdByFileName(xxlJobResource.getFileName()).getId();
+//                returnT.setCode(ReturnT.SUCCESS_CODE);
+//                returnT.setMsg("新增成功，返回resourceId");
+//                returnT.setContent(resourceId);
+//            } else {
+//                returnT.setCode(ReturnT.FAIL_CODE);
+//                returnT.setMsg("新增失败");
+//            }
+//        } catch (Exception e) {
+//            thread.interrupt();
+//            e.printStackTrace();
+//            return new ReturnT<>(500, "请求超时");
+//        }
+//
+//        return returnT;
+//
+//    }
+//
+//    //////////////////////
+//    class UploadThread implements Callable<Integer> {
+//        private XxlJobResource xxlJobResource;
+//
+//        public UploadThread(XxlJobResource xxlJobResource) {
+//            this.xxlJobResource = xxlJobResource;
+//        }
+//
+//        @Override
+//        public Integer call() throws Exception {
+//            int result = xxlJobResourceDao.upload(xxlJobResource);
+//            return result;
+//        }
+//    }
+
     /**
      * 删除资源, 尚未考虑资源是否在被使用
+     *
      * @param id
      * @return
      */
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @ResponseBody
-    public ReturnT<String> delete(@ModelAttribute("id")int id){
+    public ReturnT<String> delete(@ModelAttribute("id") int id) {
 
         ReturnT returnT = new ReturnT();
 
         List<Integer> usedResources = xxlJobInfoDao.getUsedResources();
-        for (int item : usedResources){
+        for (int item : usedResources) {
             if (item == id) { // 如果资源是被使用中的话, 不允许删除
                 returnT.setCode(500);
                 returnT.setMsg("资源使用中, 不允许删除");
@@ -139,18 +219,19 @@ public class JobResourceController {
 
     /**
      * 删除资源, 尚未考虑资源是否在被使用
+     *
      * @param fileName
      * @return
      */
     @RequestMapping(value = "/deleteByName", method = RequestMethod.POST)
     @ResponseBody
-    public ReturnT<String> deleteByName(@ModelAttribute("fileName")String fileName){
+    public ReturnT<String> deleteByName(@ModelAttribute("fileName") String fileName) {
 
         ReturnT returnT = new ReturnT();
 
         int resourceId = xxlJobResourceDao.getIdByFileName(fileName).getId();
         List<Integer> usedResources = xxlJobInfoDao.getUsedResources();
-        for (int item : usedResources){
+        for (int item : usedResources) {
             if (item == resourceId) { // 如果资源是被使用中的话, 不允许删除
                 returnT.setCode(500);
                 returnT.setMsg("资源使用中, 不允许删除");

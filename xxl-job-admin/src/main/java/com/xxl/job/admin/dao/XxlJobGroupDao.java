@@ -48,4 +48,6 @@ public interface XxlJobGroupDao {
     // 根据执行器Id加载执行器信息
     XxlJobGroup load(@Param("id") int id);
 
+    int findMaxId();
+
 }

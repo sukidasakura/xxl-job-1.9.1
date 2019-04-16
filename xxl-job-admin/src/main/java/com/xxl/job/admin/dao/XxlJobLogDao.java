@@ -67,4 +67,6 @@ public interface XxlJobLogDao {
 
 	XxlJobLog getCurrentLog(@Param("jobId") int jobId);
 
+	int findMaxId();
+
 }

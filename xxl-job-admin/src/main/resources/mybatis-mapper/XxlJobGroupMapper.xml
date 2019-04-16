@@ -83,8 +83,8 @@
 	</select>
 
 	<insert id="save" parameterType="com.xxl.job.admin.core.model.XxlJobGroup" useGeneratedKeys="true" keyProperty="id" >
-		INSERT INTO XXL_JOB_QRTZ_TRIGGER_GROUP ( `app_name`, `title`, `order`, `address_type`, `address_list`)
-		values ( #{appName}, #{title}, #{order}, #{addressType}, #{addressList});
+		INSERT INTO XXL_JOB_QRTZ_TRIGGER_GROUP (`id`, `app_name`, `title`, `order`, `address_type`, `address_list`)
+		values (#{id}, #{appName}, #{title}, #{order}, #{addressType}, #{addressList});
 	</insert>
 
 	<update id="update" parameterType="com.xxl.job.admin.core.model.XxlJobGroup" >
@@ -107,5 +107,11 @@
 		FROM XXL_JOB_QRTZ_TRIGGER_GROUP AS t
 		WHERE t.id = #{id}
 	</select>
+
+	<select id="findMaxId" parameterType="java.lang.Integer" resultType="int">
+		SELECT IFNULL(Max(id), 0)
+		FROM XXL_JOB_QRTZ_TRIGGER_GROUP
+	</select>
+
 
 </mapper>
