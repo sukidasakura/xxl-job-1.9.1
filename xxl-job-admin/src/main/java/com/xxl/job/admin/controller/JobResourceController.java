@@ -105,7 +105,7 @@ public class JobResourceController {
 
         if (xxlJobResourceDao.fileNameExist(xxlJobResource.getFileName()) != 0) {
             returnT.setCode(500);
-            returnT.setMsg("文件已存在, 重新选择文件");
+            returnT.setMessage("文件已存在, 重新选择文件");
             return returnT;
         }
 
@@ -116,7 +116,9 @@ public class JobResourceController {
             xxlJobResource.setId(id + 1);
             result = xxlJobResourceDao.upload(xxlJobResource);
         } catch (Exception e) {
-            e.printStackTrace();
+            returnT.setCode(ReturnT.FAIL_CODE);
+            returnT.setMessage("新增失败：" + e.getMessage());
+            return returnT;
         } finally {
             lock.unlock();
         }
@@ -125,11 +127,11 @@ public class JobResourceController {
         if (result > 0) {
             int resourceId = xxlJobResourceDao.getIdByFileName(xxlJobResource.getFileName()).getId();
             returnT.setCode(ReturnT.SUCCESS_CODE);
-            returnT.setMsg("新增成功，返回resourceId");
+            returnT.setMessage("新增成功，返回resourceId");
             returnT.setContent(resourceId);
         } else {
             returnT.setCode(ReturnT.FAIL_CODE);
-            returnT.setMsg("新增失败");
+            returnT.setMessage("新增失败");
         }
         return returnT;
 
@@ -208,7 +210,7 @@ public class JobResourceController {
         for (int item : usedResources) {
             if (item == id) { // 如果资源是被使用中的话, 不允许删除
                 returnT.setCode(500);
-                returnT.setMsg("资源使用中, 不允许删除");
+                returnT.setMessage("资源使用中, 不允许删除");
                 return returnT;
             }
         }
@@ -234,7 +236,7 @@ public class JobResourceController {
         for (int item : usedResources) {
             if (item == resourceId) { // 如果资源是被使用中的话, 不允许删除
                 returnT.setCode(500);
-                returnT.setMsg("资源使用中, 不允许删除");
+                returnT.setMessage("资源使用中, 不允许删除");
                 return returnT;
             }
         }

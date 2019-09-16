@@ -226,6 +226,11 @@ public class XxlJobServiceImpl implements XxlJobService {
                     "print (\"hello python\")");
             jobInfo.setGlueSource(jobInfo.getGlueSource().replaceAll("\r", ""));
         }
+
+        if (GlueTypeEnum.HIVE.name().equals(jobInfo.getGlueType())) {
+            jobInfo.setGlueSource("SELECT * FROM ... LIMIT 100");
+            jobInfo.setGlueSource(jobInfo.getGlueSource().replaceAll("\r", ""));
+        }
         jobInfo.setGlueUpdateTime(DateTool.convertDateTime(new Date()));
 
         jobInfo.setAddTime(DateTool.convertDateTime(new Date()));
@@ -545,12 +550,12 @@ public class XxlJobServiceImpl implements XxlJobService {
 
         if (ReturnT.SUCCESS_CODE == runResult.getCode()) {
             log.setHandleCode(ReturnT.FAIL_CODE);
-            log.setHandleMsg("人为操作主动终止：" + (runResult.getMsg() != null ? runResult.getMsg() : ""));
+            log.setHandleMsg("人为操作主动终止：" + (runResult.getMessage() != null ? runResult.getMessage() : ""));
             log.setHandleTime(DateTool.convertDateTime(new Date()));
             xxlJobLogDao.updateHandleInfo(log);
-            return new ReturnT<>(runResult.getMsg());
+            return new ReturnT<>(runResult.getMessage());
         } else {
-            return new ReturnT<>(500, runResult.getMsg());
+            return new ReturnT<>(500, runResult.getMessage());
         }
     }
 
@@ -600,6 +605,28 @@ public class XxlJobServiceImpl implements XxlJobService {
     @Override
     public ReturnT<String> remove(int id) {
         XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadById(id);
+        String group = String.valueOf(xxlJobInfo.getJobGroup());
+        String name = String.valueOf(xxlJobInfo.getId());
+
+        try {
+            // 调用quartz删除他内置的定时器
+            XxlJobDynamicScheduler.removeJob(name, group);
+            // 删除数据库中的任务
+            xxlJobInfoDao.delete(id);
+            // 删除调度日志
+            xxlJobLogDao.delete(id);
+            // 如果是脚本类型的任务，则删除脚本变化日志
+            xxlJobLogGlueDao.deleteByJobId(id);
+            return ReturnT.SUCCESS;
+        } catch (SchedulerException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return ReturnT.FAIL;
+    }
+
+    public ReturnT<String> removeByName(String jobName) {
+        XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadByName(jobName);
+        int id  = xxlJobInfo.getId();
         String group = String.valueOf(xxlJobInfo.getJobGroup());
         String name = String.valueOf(xxlJobInfo.getId());
 

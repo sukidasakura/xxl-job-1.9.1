@@ -42,16 +42,16 @@ public class ExecutorRouteBusyover extends ExecutorRouter {
                     .append(I18nUtil.getString("jobconf_idleBeat") + "：")
                     .append("<br>address：").append(address)
                     .append("<br>code：").append(idleBeatResult.getCode())
-                    .append("<br>msg：").append(idleBeatResult.getMsg());
+                    .append("<br>msg：").append(idleBeatResult.getMessage());
 
             // beat success 返回成功，代表这台执行服务器对应的线程处于空闲状态
             if (idleBeatResult.getCode() == ReturnT.SUCCESS_CODE) {
                 // 执行任务
                 ReturnT<String> runResult = XxlJobTrigger.runExecutor(triggerParam, address);
-                idleBeatResultSB.append("<br><br>").append(runResult.getMsg());
+                idleBeatResultSB.append("<br><br>").append(runResult.getMessage());
 
                 // result
-                runResult.setMsg(idleBeatResultSB.toString());
+                runResult.setMessage(idleBeatResultSB.toString());
                 runResult.setContent(address);
                 return runResult;
             }

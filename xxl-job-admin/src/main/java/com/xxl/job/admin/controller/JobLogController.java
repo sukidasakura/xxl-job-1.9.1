@@ -253,12 +253,12 @@ public class JobLogController {
 
 		if (ReturnT.SUCCESS_CODE == runResult.getCode()) {
 			log.setHandleCode(ReturnT.FAIL_CODE);
-			log.setHandleMsg( I18nUtil.getString("joblog_kill_log_byman")+":" + (runResult.getMsg()!=null?runResult.getMsg():""));
+			log.setHandleMsg( I18nUtil.getString("joblog_kill_log_byman")+":" + (runResult.getMessage()!=null?runResult.getMessage():""));
 			log.setHandleTime(DateTool.convertDateTime(new Date()));
 			xxlJobLogDao.updateHandleInfo(log);
-			return new ReturnT<String>(runResult.getMsg());
+			return new ReturnT<String>(runResult.getMessage());
 		} else {
-			return new ReturnT<String>(500, runResult.getMsg());
+			return new ReturnT<String>(500, runResult.getMessage());
 		}
 	}
 

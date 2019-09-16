@@ -164,13 +164,13 @@ public class XxlJobTrigger {
                     // 4.2、trigger-run (route run / trigger remote executor)
                     // 根据参数以及机器地址，向执行器发送执行信息，需要详细了解runExecutor这个方法
                     triggerResult = runExecutor(triggerParam, address);     // update03
-                    triggerMsgSb.append("<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_run") + "<<<<<<<<<<< </span><br>").append(triggerResult.getMsg());
+                    triggerMsgSb.append("<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_run") + "<<<<<<<<<<< </span><br>").append(triggerResult.getMessage());
 
                     // 4.3、trigger (fail retry)
                     if (triggerResult.getCode() != ReturnT.SUCCESS_CODE && failStrategy == ExecutorFailStrategyEnum.FAIL_RETRY) {
                         // 根据参数以及及其地址，向执行器发送执行信息
                         triggerResult = runExecutor(triggerParam, address);  // update04
-                        triggerMsgSb.append("<br><br><span style=\"color:#F39C12;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_fail_retry") + "<<<<<<<<<<< </span><br>").append(triggerResult.getMsg());
+                        triggerMsgSb.append("<br><br><span style=\"color:#F39C12;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_fail_retry") + "<<<<<<<<<<< </span><br>").append(triggerResult.getMessage());
                     }
                 }
 
@@ -266,12 +266,12 @@ public class XxlJobTrigger {
                 // 4.2、trigger-run (route run / trigger remote executor) 触发调度
                 // 此处用了策略模式，根据不同的策略，使用不同的实现类
                 triggerResult = executorRouteStrategyEnum.getRouter().routeRun(triggerParam, addressList);
-                triggerMsgSb.append("<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_run") + "<<<<<<<<<<< </span><br>").append(triggerResult.getMsg());
+                triggerMsgSb.append("<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_run") + "<<<<<<<<<<< </span><br>").append(triggerResult.getMessage());
 
                 // 4.3、trigger (fail retry) 调度失败重试
                 if (triggerResult.getCode() != ReturnT.SUCCESS_CODE && failStrategy == ExecutorFailStrategyEnum.FAIL_RETRY) {
                     triggerResult = executorRouteStrategyEnum.getRouter().routeRun(triggerParam, addressList);
-                    triggerMsgSb.append("<br><br><span style=\"color:#F39C12;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_fail_retry") + "<<<<<<<<<<< </span><br>").append(triggerResult.getMsg());
+                    triggerMsgSb.append("<br><br><span style=\"color:#F39C12;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_fail_retry") + "<<<<<<<<<<< </span><br>").append(triggerResult.getMessage());
                 }
             }
 
@@ -312,9 +312,9 @@ public class XxlJobTrigger {
         StringBuffer runResultSB = new StringBuffer(I18nUtil.getString("jobconf_trigger_run") + "：");
         runResultSB.append("<br>address：").append(address);
         runResultSB.append("<br>code：").append(runResult.getCode());
-        runResultSB.append("<br>msg：").append(runResult.getMsg());
+        runResultSB.append("<br>msg：").append(runResult.getMessage());
 
-        runResult.setMsg(runResultSB.toString());
+        runResult.setMessage(runResultSB.toString());
         runResult.setContent(address);
         return runResult;
     }

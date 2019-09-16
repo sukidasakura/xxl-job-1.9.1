@@ -83,7 +83,7 @@ public class AdminBizImpl implements AdminBiz {
                                 childJobIds.length,
                                 childJobIds[i],
                                 (triggerChildResult.getCode() == ReturnT.SUCCESS_CODE ? I18nUtil.getString("system_success") : I18nUtil.getString("system_fail")),
-                                triggerChildResult.getMsg());
+                                triggerChildResult.getMessage());
                     } else {
                         callbackMsg += MessageFormat.format(I18nUtil.getString("jobconf_callback_child_msg2"),
                                 (i + 1),
@@ -98,7 +98,7 @@ public class AdminBizImpl implements AdminBiz {
             callbackMsg = "<br><br><span style=\"color:#F39C12;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_exe_fail_retry") + "<<<<<<<<<<< </span><br>";
 
             callbackMsg += MessageFormat.format(I18nUtil.getString("jobconf_callback_msg1"),
-                    (retryTriggerResult.getCode() == ReturnT.SUCCESS_CODE ? I18nUtil.getString("system_success") : I18nUtil.getString("system_fail")), retryTriggerResult.getMsg());
+                    (retryTriggerResult.getCode() == ReturnT.SUCCESS_CODE ? I18nUtil.getString("system_success") : I18nUtil.getString("system_fail")), retryTriggerResult.getMessage());
         }
 
         // handle msg
@@ -106,8 +106,8 @@ public class AdminBizImpl implements AdminBiz {
         if (log.getHandleMsg() != null) {
             handleMsg.append(log.getHandleMsg()).append("<br>");
         }
-        if (handleCallbackParam.getExecuteResult().getMsg() != null) {
-            handleMsg.append(handleCallbackParam.getExecuteResult().getMsg());
+        if (handleCallbackParam.getExecuteResult().getMessage() != null) {
+            handleMsg.append(handleCallbackParam.getExecuteResult().getMessage());
         }
         if (callbackMsg != null) {
             handleMsg.append(callbackMsg);

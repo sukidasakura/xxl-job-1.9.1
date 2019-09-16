@@ -79,7 +79,7 @@ public class XxlJobResourceDaoTest {
 
         if (xxlJobResourceDao.fileNameExist(xxlJobResource.getFileName()) != 0){
             returnT.setCode(500);
-            returnT.setMsg("文件已存在, 重新选择文件");
+            returnT.setMessage("文件已存在, 重新选择文件");
             System.out.println("=================");
             System.out.println(JSON.toJSONString(returnT));
             System.out.println("=================");
@@ -99,11 +99,11 @@ public class XxlJobResourceDaoTest {
             if (result > 0){
                 int resourceId = xxlJobResourceDao.getIdByFileName(xxlJobResource.getFileName()).getId();
                 returnT.setCode(ReturnT.SUCCESS_CODE);
-                returnT.setMsg("新增成功，返回resourceId");
+                returnT.setMessage("新增成功，返回resourceId");
                 returnT.setContent(resourceId);
             } else {
                 returnT.setCode(ReturnT.FAIL_CODE);
-                returnT.setMsg("新增失败");
+                returnT.setMessage("新增失败");
             }
         } catch (Exception e) {
             thread.interrupt();

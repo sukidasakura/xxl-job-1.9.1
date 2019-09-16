@@ -251,6 +251,12 @@
 		WHERE id = #{id}
 	</delete>
 
+	<delete id="deleteByName" parameterType="java.util.HashMap">
+		DELETE
+		FROM XXL_JOB_QRTZ_TRIGGER_INFO
+		WHERE job_name = #{jobName}
+	</delete>
+
 	<select id="getJobsByGroup" parameterType="java.util.HashMap" resultMap="XxlJobInfo">
 		SELECT <include refid="Base_Column_List" />
 		FROM XXL_JOB_QRTZ_TRIGGER_INFO AS t

@@ -42,16 +42,16 @@ public class ExecutorRouteFailover extends ExecutorRouter {
                     .append(I18nUtil.getString("jobconf_beat") + "：")
                     .append("<br>address：").append(address)
                     .append("<br>code：").append(beatResult.getCode())
-                    .append("<br>msg：").append(beatResult.getMsg());
+                    .append("<br>msg：").append(beatResult.getMessage());
 
             // beat success 返回状态为成功
             if (beatResult.getCode() == ReturnT.SUCCESS_CODE) {
                 // 执行任务
                 ReturnT<String> runResult = XxlJobTrigger.runExecutor(triggerParam, address);
-                beatResultSB.append("<br><br>").append(runResult.getMsg());
+                beatResultSB.append("<br><br>").append(runResult.getMessage());
 
                 // result
-                runResult.setMsg(beatResultSB.toString());
+                runResult.setMessage(beatResultSB.toString());
                 runResult.setContent(address);
                 return runResult;
             }

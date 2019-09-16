@@ -111,9 +111,12 @@ public class ScriptUtil {
         try (FileOutputStream fileOutputStream = new FileOutputStream(logFile, true)) {
             PumpStreamHandler streamHandler = new PumpStreamHandler(fileOutputStream, fileOutputStream, null);
 
-            // command：bash或python
+            // command：bash或python或hive -f
             CommandLine commandline = new CommandLine(command);
-            //
+
+            if (command.equals("hive")) {
+                commandline.addArgument("-f");
+            }
             commandline.addArgument(scriptFile);
             if (params!=null && params.length>0) {
                 commandline.addArguments(params);

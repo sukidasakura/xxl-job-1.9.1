@@ -272,7 +272,7 @@ public class ExecutorBizImpl implements ExecutorBiz {
                 }
             }
         } else if (glueTypeEnum != null && glueTypeEnum.isScript()) {
-            // 其他脚本执行模式，shell , python等
+            // 其他脚本执行模式，shell , python, hive等
 
             logger.info("==== glueType is script!====");
             // valid old jobThread

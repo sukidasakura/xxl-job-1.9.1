@@ -16,13 +16,13 @@ public class ReturnT<T> implements Serializable {
 	public static final ReturnT<String> FAIL = new ReturnT<String>(FAIL_CODE, null);
 	
 	private int code;
-	private String msg;
+	private String message;
 	private T content;
 
 	public ReturnT(){}
-	public ReturnT(int code, String msg) {
+	public ReturnT(int code, String message) {
 		this.code = code;
-		this.msg = msg;
+		this.message = message;
 	}
 	public ReturnT(T content) {
 		this.code = SUCCESS_CODE;
@@ -35,12 +35,15 @@ public class ReturnT<T> implements Serializable {
 	public void setCode(int code) {
 		this.code = code;
 	}
-	public String getMsg() {
-		return msg;
+
+	public String getMessage() {
+		return message;
 	}
-	public void setMsg(String msg) {
-		this.msg = msg;
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
+
 	public T getContent() {
 		return content;
 	}
@@ -50,7 +53,7 @@ public class ReturnT<T> implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ReturnT [code=" + code + ", msg=" + msg + ", content=" + content + "]";
+		return "ReturnT [code=" + code + ", msg=" + message + ", content=" + content + "]";
 	}
 
 }

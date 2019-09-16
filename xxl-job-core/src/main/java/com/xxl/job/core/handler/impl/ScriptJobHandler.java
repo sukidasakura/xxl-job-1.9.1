@@ -53,7 +53,7 @@ public class ScriptJobHandler extends IJobHandler {
         }
 
         // cmd
-        String cmd = glueType.getCmd(); // shell脚本对应bash，python脚本对应python
+        String cmd = glueType.getCmd(); // shell脚本对应bash，python脚本对应python，hive脚本对应hive
 
         if (resources != null) {
             // 1.在执行器上生成jar等资源文件   2.替换代码中的资源名为资源路径

@@ -135,6 +135,13 @@ public class JobInfoController {
 		return xxlJobService.remove(id);
 	}
 
+	// 删除任务
+	@RequestMapping(value = "/removeByName", method = RequestMethod.POST)
+	@ResponseBody
+	public ReturnT<String> removeByName(String jobName) {
+		return xxlJobService.removeByName(jobName);
+	}
+
 	// 根据id加载任务
 	@RequestMapping(value = "/load", method = RequestMethod.POST)
 	@ResponseBody

@@ -135,8 +135,10 @@ public class JobGroupController {
         int ret = 0;
         try {
             lock.lock();
-            int id = xxlJobGroupDao.findMaxId();
-            xxlJobGroup.setId(id + 1);
+            int maxId = xxlJobGroupDao.findMaxId();
+            if (maxId > 20) maxId ++;
+            else maxId = 21;
+            xxlJobGroup.setId(maxId);
             ret = xxlJobGroupDao.save(xxlJobGroup);
         } catch (Exception e) {
             e.printStackTrace();

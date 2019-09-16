@@ -114,6 +114,13 @@ public interface XxlJobService {
 	public ReturnT<String> remove(int id);
 
 	/**
+	 * remove job by name
+	 * @param jobName
+	 * @return
+	 */
+	public ReturnT<String> removeByName(String jobName);
+
+	/**
 	 * pause job
 	 *
 	 * @param id
