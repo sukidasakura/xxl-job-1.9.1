@@ -1,6 +1,8 @@
 package com.xxl.job.core.biz.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.supconit.data.crud.services.CrudAccessService;
 import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.biz.model.LogResult;
 import com.xxl.job.core.biz.model.ReturnT;
@@ -11,24 +13,20 @@ import com.xxl.job.core.glue.GlueFactory;
 import com.xxl.job.core.glue.GlueTypeEnum;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.impl.GlueJobHandler;
+import com.xxl.job.core.handler.impl.PrestoJobHandler;
 import com.xxl.job.core.handler.impl.ScriptJobHandler;
 import com.xxl.job.core.log.XxlJobFileAppender;
 import com.xxl.job.core.log.XxlJobLogger;
 import com.xxl.job.core.thread.JobThread;
 import com.xxl.job.core.util.ScriptUtil;
-import com.xxl.job.core.util.ShardingUtil;
 import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.PumpStreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.exec.CommandLine;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +40,12 @@ import java.util.Map;
  */
 public class ExecutorBizImpl implements ExecutorBiz {
     private static Logger logger = LoggerFactory.getLogger(ExecutorBizImpl.class);
+
+    private CrudAccessService crudAccessService;
+
+    public ExecutorBizImpl(CrudAccessService crudAccessService) {
+        this.crudAccessService = crudAccessService;
+    }
 
     @Override
     public ReturnT<String> beat() {
@@ -244,6 +248,31 @@ public class ExecutorBizImpl implements ExecutorBiz {
                 jobHandler = newJobHandler;
                 if (jobHandler == null) {
                     return new ReturnT<String>(ReturnT.FAIL_CODE, "job handler [" + triggerParam.getExecutorHandler() + "] not found.");
+                }
+            }
+
+        } else if (GlueTypeEnum.PRESTO == glueTypeEnum) {
+            // 当任务类型为presto时，以自定义JOBHANDLE的模式运行
+
+            // valid old jobThread
+            if (jobThread != null &&
+                    !(jobThread.getHandler() instanceof PrestoJobHandler
+                            && ((PrestoJobHandler) jobThread.getHandler()).getGlueUpdatetime() == triggerParam.getGlueUpdatetime())) {
+                removeOldReason = "更新任务逻辑或更换任务模式,终止旧任务线程";
+
+                jobThread = null;
+                jobHandler = null;
+            }
+
+            // valid handler
+            if (jobHandler == null) {
+                try {
+                    System.out.println("triggerParam.getPrestoParam(): " + JSON.toJSONString(triggerParam.getPrestoParam()));
+                    jobHandler = new PrestoJobHandler(triggerParam.getGlueUpdatetime(),
+                            triggerParam.getPrestoParam(), crudAccessService);
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                    return new ReturnT<>(ReturnT.FAIL_CODE, e.getMessage());
                 }
             }
 

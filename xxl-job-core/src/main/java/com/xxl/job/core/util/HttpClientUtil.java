@@ -3,9 +3,12 @@ package com.xxl.job.core.util;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -22,6 +25,24 @@ import java.io.InputStream;
  */
 public class HttpClientUtil {
 	private static Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
+
+	private static final int connectTimeout = 5000;
+
+	private RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(getConnecttimeout())
+			.setConnectTimeout(getConnecttimeout()).setConnectionRequestTimeout(getConnecttimeout())
+			.build();
+
+	private static HttpClientUtil instance = null;
+
+	private HttpClientUtil() {
+	}
+
+	public static HttpClientUtil getInstance() {
+		if (instance == null) {
+			instance = new HttpClientUtil();
+		}
+		return instance;
+	}
 
 	/**
 	 * post request
@@ -106,6 +127,123 @@ public class HttpClientUtil {
 			}
 		}
 		return new byte[] {};
+	}
+
+
+	/**
+	 * 发送 post请求
+	 *
+	 * @param httpUrl 地址
+	 * @param params  参数(格式:key1=value1&key2=value2)
+	 */
+	public String sendHttpPost(String httpUrl, String params) {
+		HttpPost httpPost = new HttpPost(httpUrl);
+		try {
+			StringEntity stringEntity = new StringEntity(params, "UTF-8");
+			stringEntity.setContentType("application/x-www-form-urlencoded");
+			httpPost.setEntity(stringEntity);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return sendHttpPost(httpPost);
+	}
+
+
+	/**
+	 * 发送Post请求
+	 *
+	 * @param httpPost
+	 * @return
+	 */
+	private String sendHttpPost(HttpPost httpPost) {
+		CloseableHttpClient httpClient = null;
+		CloseableHttpResponse response = null;
+		HttpEntity entity = null;
+		String responseContent = null;
+		try {
+			httpClient = HttpClients.createDefault();
+			httpPost.setConfig(requestConfig);
+			response = httpClient.execute(httpPost);
+			entity = response.getEntity();
+			responseContent = EntityUtils.toString(entity, "UTF-8");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (response != null) {
+					response.close();
+				}
+				if (httpClient != null) {
+					httpClient.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return responseContent;
+	}
+
+	/**
+	 * 发送 get请求
+	 *
+	 * @param httpUrl
+	 */
+	public String sendHttpGet(int connectTimeout, String httpUrl) {
+		HttpGet httpGet = new HttpGet(httpUrl);
+		return sendHttpGet(connectTimeout, httpGet);
+	}
+
+
+	/**
+	 * 发送Get请求
+	 *
+	 * @param connectTimeout
+	 * @param httpGet
+	 * @return
+	 */
+	private String sendHttpGet(int connectTimeout, HttpGet httpGet) {
+		CloseableHttpClient httpClient = null;
+		CloseableHttpResponse response = null;
+		HttpEntity entity = null;
+		String responseContent = null;
+		try {
+			httpClient = HttpClients.createDefault();
+			httpGet.setConfig(requestConfig(connectTimeout));
+			response = httpClient.execute(httpGet);
+			entity = response.getEntity();
+
+			responseContent = EntityUtils.toString(entity, "UTF-8");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (response != null) {
+					response.close();
+				}
+				if (httpClient != null) {
+					httpClient.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return responseContent;
+	}
+
+
+	private RequestConfig requestConfig(int connectTimeout) {
+		if (connectTimeout == 0) {
+			connectTimeout = HttpClientUtil.getConnecttimeout();
+		}
+		return RequestConfig.custom().setSocketTimeout(connectTimeout).setConnectTimeout(connectTimeout)
+				.setConnectionRequestTimeout(connectTimeout).build();
+	}
+
+	/**
+	 * @return connecttimeout
+	 */
+	public static int getConnecttimeout() {
+		return connectTimeout;
 	}
 
 }

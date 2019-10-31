@@ -2,8 +2,6 @@ package com.xxl.job.admin.dao;
 
 import com.alibaba.fastjson.JSON;
 import com.xxl.job.admin.core.model.XxlJobInfo;
-import com.xxl.job.admin.core.model.XxlJobResource;
-import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.util.DateTool;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,9 +10,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath*:spring/applicationcontext-*.xml")
@@ -177,6 +173,4 @@ public class XxlJobInfoDaoTest {
         }
         System.out.println("=====");
     }
-
-
 }

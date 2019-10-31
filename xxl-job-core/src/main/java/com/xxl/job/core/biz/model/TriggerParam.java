@@ -1,5 +1,7 @@
 package com.xxl.job.core.biz.model;
 
+import com.xxl.job.core.entity.presto.PrestoParam;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,8 @@ public class TriggerParam implements Serializable{
 
     private String customParam;
     private Map<String, byte[]> resources;
+
+    private PrestoParam prestoParam;
 
     public int getJobId() {
         return jobId;
@@ -133,6 +137,13 @@ public class TriggerParam implements Serializable{
         this.customParam = customParam;
     }
 
+    public PrestoParam getPrestoParam() {
+        return prestoParam;
+    }
+
+    public void setPrestoParam(PrestoParam prestoParam) {
+        this.prestoParam = prestoParam;
+    }
 
     @Override
     public String toString() {

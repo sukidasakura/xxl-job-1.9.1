@@ -1,5 +1,6 @@
 package com.xxl.job.core.executor;
 
+import com.supconit.data.crud.services.CrudAccessService;
 import com.xxl.job.core.biz.AdminBiz;
 import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.biz.impl.ExecutorBizImpl;
@@ -19,6 +20,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +33,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class XxlJobExecutor implements ApplicationContextAware {
     private static final Logger logger = LoggerFactory.getLogger(XxlJobExecutor.class);
+
+    @Resource
+    private CrudAccessService crudAccessService;
 
     // ---------------------- param ----------------------
     private String adminAddresses;
@@ -137,7 +142,7 @@ public class XxlJobExecutor implements ApplicationContextAware {
 
         // start server
         // 创建一个ExecutorService实例，放入Map中，后面会通过class获取到他的实例执行run方法
-        NetComServerFactory.putService(ExecutorBiz.class, new ExecutorBizImpl());   // rpc-service, base on jetty
+        NetComServerFactory.putService(ExecutorBiz.class, new ExecutorBizImpl(crudAccessService));   // rpc-service, base on jetty
         NetComServerFactory.setAccessToken(accessToken);
         // 启动jetty服务器
         serverFactory.start(port, ip, appName); // jetty + registry

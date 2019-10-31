@@ -12,8 +12,8 @@ import com.xxl.job.admin.core.util.I18nUtil;
 import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.biz.model.TriggerParam;
+import com.xxl.job.core.entity.presto.PrestoParam;
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
-import com.xxl.job.core.log.XxlJobFileAppender;
 import com.xxl.job.core.util.DateTool;
 import com.xxl.job.core.util.IpUtil;
 import org.apache.commons.collections4.CollectionUtils;
@@ -143,7 +143,7 @@ public class XxlJobTrigger {
                     triggerParam.setBroadcastIndex(i); //设置分片标记
                     triggerParam.setBroadcastTotal(addressList.size()); // update02 设计分片总数
 
-                    // 设置资源名和资源内容
+                    // [supcon]设置资源名和资源内容
                     if (StringUtils.isNotBlank(jobInfo.getResourceId())) {
                         Map<String, byte[]> map = new HashMap<>();
                         String[] resourceIds = StringUtils.split(jobInfo.getResourceId(), ",");
@@ -156,9 +156,29 @@ public class XxlJobTrigger {
                         //
                         triggerParam.setResources(map);
                     }
-                    // 设置自定义参数
+                    // [supcon]设置自定义参数
                     if (jobInfo.getCustomParam() != null) {
                         triggerParam.setCustomParam(jobInfo.getCustomParam());
+                    }
+                    // [supcon]设置Presto参数
+                    if (jobInfo.getPrestoParam() != null) {
+                        triggerParam.setPrestoParam(jobInfo.getPrestoParam());
+                    }
+                    if (jobInfo.getPrestoParam() == null) {
+                        PrestoParam prestoParam = new PrestoParam();
+                        prestoParam.setYanagishimaAddress("10.10.77.109:9083");
+                        prestoParam.setDataSource("your-presto");
+                        prestoParam.setPrestoDbDriver("com.mysql.jdbc.Driver");
+                        prestoParam.setPrestoDbJdbcUrl("jdbc:mysql://10.10.77.138:3306/presto?autoReconnect=true");
+                        prestoParam.setPrestoDbUsername("root");
+                        prestoParam.setPrestoDbPassword("supconit");
+                        prestoParam.setJobId(1);
+                        prestoParam.setQuery("SELECT * FROM oracle.dc.\"notebook\" LIMIT 100");
+                        prestoParam.setTitle("testTitle");
+                        prestoParam.setSave2db(1);
+                        prestoParam.setItemId(Long.valueOf(4761));
+                        prestoParam.setDataManageAddress("http://10.10.77.135:8090/data_manage_web");
+                        triggerParam.setPrestoParam(prestoParam);
                     }
 
                     // 4.2、trigger-run (route run / trigger remote executor)
@@ -261,6 +281,26 @@ public class XxlJobTrigger {
                 // 设置自定义参数
                 if (jobInfo.getCustomParam() != null) {
                     triggerParam.setCustomParam(jobInfo.getCustomParam());
+                }
+                // [supcon]设置Presto参数
+                if (jobInfo.getPrestoParam() != null) {
+                    triggerParam.setPrestoParam(jobInfo.getPrestoParam());
+                }
+                if (jobInfo.getPrestoParam() == null) {
+                    PrestoParam prestoParam = new PrestoParam();
+                    prestoParam.setYanagishimaAddress("10.10.77.109:9083");
+                    prestoParam.setDataSource("your-presto");
+                    prestoParam.setPrestoDbDriver("com.mysql.jdbc.Driver");
+                    prestoParam.setPrestoDbJdbcUrl("jdbc:mysql://10.10.77.138:3306/presto?autoReconnect=true");
+                    prestoParam.setPrestoDbUsername("root");
+                    prestoParam.setPrestoDbPassword("supconit");
+                    prestoParam.setJobId(1);
+                    prestoParam.setQuery("SELECT * FROM oracle.dc.\"notebook\" LIMIT 100");
+                    prestoParam.setTitle("testTitle");
+                    prestoParam.setSave2db(1);
+                    prestoParam.setItemId(Long.valueOf(4761));
+                    prestoParam.setDataManageAddress("http://10.10.77.135:8090/data_manage_web");
+                    triggerParam.setPrestoParam(prestoParam);
                 }
 
                 // 4.2、trigger-run (route run / trigger remote executor) 触发调度

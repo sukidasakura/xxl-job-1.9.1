@@ -1,5 +1,7 @@
 package com.xxl.job.admin.core.model;
 
+import com.xxl.job.core.entity.presto.PrestoParam;
+
 import java.util.Date;
 import java.util.Map;
 
@@ -41,8 +43,6 @@ public class XxlJobInfo {
 	/** 失败处理策略 **/
 	private String executorFailStrategy;
 
-	/** 任务类型ID，与glueType对应**/
-	private int typeId;
 	/** glue类型 **/
 	private String glueType;
 	/** glue源代码 **/
@@ -65,6 +65,8 @@ public class XxlJobInfo {
 
 	/** 自定义参数，可能多个，格式为{"param1":"1","param2":"2"}，需要转化为JSONObject **/
 	private String customParam;
+
+	private PrestoParam prestoParam;
 
 	public String getCustomParam() {
 		return customParam;
@@ -258,11 +260,11 @@ public class XxlJobInfo {
 		this.folderId = folderId;
 	}
 
-	public int getTypeId() {
-		return typeId;
+	public PrestoParam getPrestoParam() {
+		return prestoParam;
 	}
 
-	public void setTypeId(int typeId) {
-		this.typeId = typeId;
+	public void setPrestoParam(PrestoParam prestoParam) {
+		this.prestoParam = prestoParam;
 	}
 }

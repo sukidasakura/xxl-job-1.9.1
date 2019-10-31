@@ -1,39 +1,149 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.xuxueli</groupId>
-		<artifactId>xxl-job-executor-samples</artifactId>
-		<version>1.9.1</version>
-	</parent>
-	<artifactId>xxl-job-executor-sample-spring</artifactId>
-	<packaging>war</packaging>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.xuxueli</groupId>
+        <artifactId>xxl-job-executor-samples</artifactId>
+        <version>1.9.1</version>
+    </parent>
+    <artifactId>xxl-job-executor-sample-spring</artifactId>
+    <packaging>war</packaging>
 
-	<name>${project.artifactId}</name>
-	<description>Executor project for spring boot.</description>
-	<url>http://www.xuxueli.com/</url>
+    <name>${project.artifactId}</name>
+    <description>Executor project for spring boot.</description>
+    <url>http://www.xuxueli.com/</url>
 
-	<dependencies>
-		<!-- spring-webmvc -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
+    <properties>
+        <data.center.version>1.2.00.180701-SNAPSHOT</data.center.version>
+    </properties>
 
-		<!-- slf4j -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j-api.version}</version>
-		</dependency>
-		
-		<!-- xxl-job-core -->
-		<dependency>
-			<groupId>com.xuxueli</groupId>
-			<artifactId>xxl-job-core</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <!-- spring-webmvc -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <!-- slf4j -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j-api.version}</version>
+        </dependency>
+
+        <!-- xxl-job-core -->
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>5.1.40</version>
+        </dependency>
+
+        <!--es-->
+        <dependency>
+            <groupId>org.elasticsearch.plugin</groupId>
+            <artifactId>transport-netty4-client</artifactId>
+            <version>6.1.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/transport-netty4-client-6.1.1.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-elasticsearch</artifactId>
+            <version>1.4.0.M1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/spring-data-elasticsearch-1.4.0.M1.jar</systemPath>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>1.7.3</version>
+        </dependency>
+
+        <!--supcon crud-->
+        <dependency>
+            <groupId>com.supconit.data</groupId>
+            <artifactId>data_crud_impl</artifactId>
+            <version>${data.center.version}</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/data_crud_impl-1.2.00.180701-SNAPSHOT.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.supconit.data</groupId>
+            <artifactId>data_catalog_api</artifactId>
+            <version>${data.center.version}</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/data_catalog_api-1.2.00.180701-SNAPSHOT.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.supconit.data</groupId>
+            <artifactId>data_catalog_impl</artifactId>
+            <version>${data.center.version}</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/data_catalog_impl-1.2.00.180701-SNAPSHOT.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.supconit.data</groupId>
+            <artifactId>data_common</artifactId>
+            <version>${data.center.version}</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/data_common-1.2.00.180701-SNAPSHOT.jar</systemPath>
+        </dependency>
+
+        <!--不可缺-->
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc7</artifactId>
+            <version>12.1.0.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/ojdbc7-12.1.0.2.jar</systemPath>
+        </dependency>
+
+        <!-- junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <!--<warName>${project.artifactId}</warName>-->
+                    <webResources>
+                        <resource>
+                            <directory>lib/</directory>
+                            <targetPath>WEB-INF/lib</targetPath>
+                            <includes>
+                                <include>**/*.jar</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

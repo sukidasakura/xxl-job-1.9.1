@@ -10,7 +10,8 @@ public enum GlueTypeEnum {
     SHELL("SHELL", true, "bash", ".sh"),
     PYTHON("PYTHON", true, "python", ".py"),
     GLUE_NODEJS("GLUE模式(Nodejs)", true, "node", ".js"),
-    HIVE("HIVE", true, "hive",".sql");
+    HIVE("HIVE", true, "hive",".sql"),
+    PRESTO("PRESTO", false, null, null);
 
     private String desc;
     private boolean isScript;

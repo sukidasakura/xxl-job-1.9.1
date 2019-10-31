@@ -1,6 +1,5 @@
 package com.xxl.job.admin.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.xxl.job.admin.core.enums.ExecutorFailStrategyEnum;
 import com.xxl.job.admin.core.model.*;
 import com.xxl.job.admin.core.route.ExecutorRouteStrategyEnum;
@@ -14,9 +13,7 @@ import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.biz.model.TriggerParam;
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.glue.GlueTypeEnum;
-import com.xxl.job.core.log.XxlJobFileAppender;
 import com.xxl.job.core.util.DateTool;
-import com.xxl.job.core.util.ScriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -28,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;

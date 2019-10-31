@@ -31,7 +31,6 @@
 		<result column="child_jobid" property="childJobId" />
 		<result column="custom_param" property="customParam" />
 		<result column="resource_id" property="resourceId" />
-		<result column="type_id" property="typeId" />
 		<result column="folder_id" property="folderId" />
 	</resultMap>
 
@@ -57,7 +56,6 @@
 		t.child_jobid,
 		t.custom_param,
 		t.resource_id,
-		t.type_id,
 		t.folder_id
 	</sql>
 
@@ -175,8 +173,7 @@
 			child_jobid,
 		    custom_param,
 		    resource_id,
-		    folder_id,
-			type_id
+		    folder_id
 		) VALUES (
 			#{id},
 			#{jobGroup},
@@ -199,8 +196,7 @@
 			#{childJobId},
 		    #{customParam},
 		    #{resourceId},
-			#{folderId},
-			#{typeId}
+			#{folderId}
 		);
 		<!--<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
 			SELECT LAST_INSERT_ID()
