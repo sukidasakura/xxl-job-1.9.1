@@ -1,6 +1,5 @@
 package com.xxl.job.admin.dao;
 
-import com.xxl.job.admin.core.model.XxlJobLog;
 import com.xxl.job.admin.core.model.XxlJobLogGlue;
 import org.apache.ibatis.annotations.Param;
 

@@ -267,7 +267,10 @@ public class ExecutorBizImpl implements ExecutorBiz {
             // valid handler
             if (jobHandler == null) {
                 try {
+                    System.out.println("~~~~~~~~~~~~~~");
+                    System.out.println("triggerParam: " + JSON.toJSONString(triggerParam));
                     System.out.println("triggerParam.getPrestoParam(): " + JSON.toJSONString(triggerParam.getPrestoParam()));
+                    System.out.println("~~~~~~~~~~~~~~");
                     jobHandler = new PrestoJobHandler(triggerParam.getGlueUpdatetime(),
                             triggerParam.getPrestoParam(), crudAccessService);
                 } catch (Exception e) {

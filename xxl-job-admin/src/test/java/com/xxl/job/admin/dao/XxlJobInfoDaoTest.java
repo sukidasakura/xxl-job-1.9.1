@@ -1,7 +1,10 @@
 package com.xxl.job.admin.dao;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.xxl.job.admin.core.model.XxlJobInfo;
+import com.xxl.job.core.entity.presto.PrestoParam;
 import com.xxl.job.core.util.DateTool;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -88,32 +91,48 @@ public class XxlJobInfoDaoTest {
         info.setGlueRemark("setGlueRemark");
         info.setChildJobId("1");
 
+        PrestoParam prestoParam = new PrestoParam();
+        prestoParam.setYanagishimaAddress("10.10.77.109:9083");
+        prestoParam.setDataSource("your-presto");
+        prestoParam.setPrestoDbDriver("com.mysql.jdbc.Driver");
+        prestoParam.setPrestoDbJdbcUrl("jdbc:mysql://10.10.77.138:3306/presto?autoReconnect=true");
+        prestoParam.setPrestoDbUsername("root");
+        prestoParam.setPrestoDbPassword("supconit");
+        prestoParam.setJobId(1);
+        prestoParam.setQuery("SELECT * FROM oracle.dc.\"notebook\" LIMIT 100");
+        prestoParam.setTitle("testTitle");
+        prestoParam.setSave2db(1);
+        prestoParam.setItemId(Long.valueOf(4761));
+        prestoParam.setDataManageAddress("http://10.10.77.135:8090/data_manage_web");
+
+        info.setPrestoParam(JSON.toJSONString(prestoParam));
+
         int count = xxlJobInfoDao.save(info);
 
-        XxlJobInfo info2 = xxlJobInfoDao.loadById(info.getId());
-        info2.setJobCron("jobCron2");
-        info.setJobName("jobName");
-        info2.setJobDesc("desc2");
-        info2.setAuthor("setAuthor2");
-        info2.setAlarmEmail("setAlarmEmail2");
-        info2.setExecutorRouteStrategy("setExecutorRouteStrategy2");
-        info2.setExecutorHandler("setExecutorHandler2");
-        info2.setExecutorParam("setExecutorParam2");
-        info2.setExecutorBlockStrategy("setExecutorBlockStrategy2");
-        info2.setExecutorFailStrategy("setExecutorFailStrategy2");
-        info2.setGlueType("setGlueType2");
-        info2.setGlueSource("setGlueSource2");
-        info2.setGlueRemark("setGlueRemark2");
-        info2.setGlueUpdateTime(DateTool.convertDateTime(new Date()));
-        info2.setChildJobId("1");
-
-        int item2 = xxlJobInfoDao.update(info2);
-
-        xxlJobInfoDao.delete(info2.getId());
-
-        List<XxlJobInfo> list2 = xxlJobInfoDao.getJobsByGroup(1);
-
-        int ret3 = xxlJobInfoDao.findAllCount();
+//        XxlJobInfo info2 = xxlJobInfoDao.loadById(info.getId());
+//        info2.setJobCron("jobCron2");
+//        info.setJobName("jobName");
+//        info2.setJobDesc("desc2");
+//        info2.setAuthor("setAuthor2");
+//        info2.setAlarmEmail("setAlarmEmail2");
+//        info2.setExecutorRouteStrategy("setExecutorRouteStrategy2");
+//        info2.setExecutorHandler("setExecutorHandler2");
+//        info2.setExecutorParam("setExecutorParam2");
+//        info2.setExecutorBlockStrategy("setExecutorBlockStrategy2");
+//        info2.setExecutorFailStrategy("setExecutorFailStrategy2");
+//        info2.setGlueType("setGlueType2");
+//        info2.setGlueSource("setGlueSource2");
+//        info2.setGlueRemark("setGlueRemark2");
+//        info2.setGlueUpdateTime(DateTool.convertDateTime(new Date()));
+//        info2.setChildJobId("1");
+//
+//        int item2 = xxlJobInfoDao.update(info2);
+//
+//        xxlJobInfoDao.delete(info2.getId());
+//
+//        List<XxlJobInfo> list2 = xxlJobInfoDao.getJobsByGroup(1);
+//
+//        int ret3 = xxlJobInfoDao.findAllCount();
 
     }
 
@@ -149,10 +168,11 @@ public class XxlJobInfoDaoTest {
 
     @Test
     public void pageList3() {
-        System.out.println("==========");
-        XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadById(41);
-        System.out.println(xxlJobInfo.getGlueSource());
-        System.out.println("=====");
+        System.out.println("===============");
+        XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadById(0);
+        PrestoParam prestoParam = JSONObject.parseObject(xxlJobInfo.getPrestoParam(), new TypeReference<PrestoParam>(){});
+        System.out.println(prestoParam.getQuery());
+        System.out.println("===============");
     }
 
     @Test

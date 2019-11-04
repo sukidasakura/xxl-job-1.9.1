@@ -32,6 +32,7 @@
 		<result column="custom_param" property="customParam" />
 		<result column="resource_id" property="resourceId" />
 		<result column="folder_id" property="folderId" />
+		<result column="presto_param" property="prestoParam" />
 	</resultMap>
 
 	<sql id="Base_Column_List">
@@ -56,7 +57,8 @@
 		t.child_jobid,
 		t.custom_param,
 		t.resource_id,
-		t.folder_id
+		t.folder_id,
+		t.presto_param
 	</sql>
 
 
@@ -173,7 +175,8 @@
 			child_jobid,
 		    custom_param,
 		    resource_id,
-		    folder_id
+		    folder_id,
+			presto_param
 		) VALUES (
 			#{id},
 			#{jobGroup},
@@ -196,7 +199,8 @@
 			#{childJobId},
 		    #{customParam},
 		    #{resourceId},
-			#{folderId}
+			#{folderId},
+			#{prestoParam}
 		);
 		<!--<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
 			SELECT LAST_INSERT_ID()
@@ -237,7 +241,8 @@
 			glue_updatetime = #{glueUpdateTime},
 			child_jobid = #{childJobId},
 			custom_param = #{customParam},
-			resource_id = #{resourceId}
+			resource_id = #{resourceId},
+			presto_param = #{prestoParam}
 		WHERE id = #{id}
 	</update>
 	

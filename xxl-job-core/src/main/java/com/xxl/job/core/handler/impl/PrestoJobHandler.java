@@ -1,24 +1,21 @@
 package com.xxl.job.core.handler.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.supconit.data.crud.services.CrudAccessService;
 import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.entity.presto.*;
-import com.xxl.job.core.entity.presto.catalog.DataContainer;
-import com.xxl.job.core.entity.presto.catalog.DataElement;
+import com.xxl.job.core.entity.presto.PrestoParam;
+import com.xxl.job.core.entity.presto.PrestoResults;
+import com.xxl.job.core.entity.presto.QueryStatus;
 import com.xxl.job.core.entity.presto.catalog.DataItem;
 import com.xxl.job.core.entity.presto.catalog.DataAccessBackResult;
 import com.xxl.job.core.handler.IJobHandler;
-import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import com.xxl.job.core.util.FieldUtil;
 import com.xxl.job.core.util.HttpClientUtil;
-import org.springframework.context.annotation.ImportResource;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -55,13 +52,15 @@ public class PrestoJobHandler extends IJobHandler{
 
     private int save2db; // 是否将查询结果定时存储到数据库
     private Long itemId; // 数据容器接口需要的ID
+    private String orderedElements; // 需要存储到数据库的数据元(字段)有序列表
 
     public PrestoJobHandler() {
     }
 
     public PrestoJobHandler(String glueUpdatetime,
-                     PrestoParam prestoParam, CrudAccessService crudAccessService){
-        System.out.println("PrestoJobHandler PrestoParam: " + prestoParam);
+                     String prestoParam1, CrudAccessService crudAccessService){
+        System.out.println("PrestoJobHandler PrestoParam: " + prestoParam1);
+        PrestoParam prestoParam = JSONObject.parseObject(prestoParam1, new TypeReference<PrestoParam>(){});
         this.glueUpdatetime = glueUpdatetime;
         this.prestoAPI = "http://" + prestoParam.getYanagishimaAddress();
         this.datasource = prestoParam.getDataSource();
@@ -72,6 +71,7 @@ public class PrestoJobHandler extends IJobHandler{
         this.itemId = prestoParam.getItemId();
         this.dataManageAddress = prestoParam.getDataManageAddress();
         this.crudAccessService = crudAccessService;
+        this.orderedElements = prestoParam.getOrderedElements();
 
         try {
             Class.forName(prestoParam.getPrestoDbDriver());
@@ -146,18 +146,22 @@ public class PrestoJobHandler extends IJobHandler{
     }
 
 
+    // 将查询结果存储到数据库也需要用一个线程去做，因为可能会导半天，数据量大
     public class batchCreateCallable implements Callable<String> {
 
         private String json;
         private Long itemId; // 数据容器接口需要的ID
         private String dataManageAddress;
+        private String orderedElements;
 
         public batchCreateCallable(String json,
                                    Long itemId,
-                                   String dataManageAddress) {
+                                   String dataManageAddress,
+                                   String orderedElements) {
             this.json = json;
             this.itemId = itemId;
             this.dataManageAddress = dataManageAddress;
+            this.orderedElements = orderedElements;
         }
 
         @Override
@@ -166,30 +170,33 @@ public class PrestoJobHandler extends IJobHandler{
 
             if (prestoResults.getError() == null) { // 运行结果正确
                 String[][] results = prestoResults.getResults();
-                System.out.println(JSON.toJSONString(results));
 
-                // 根据itemId获取业务库中有哪些字段
-                String itemJson = HttpClientUtil.getInstance().sendHttpGet(5000,
-                        dataManageAddress + "/catalog/item/elements/" + itemId);
-                Map<String, List<DataElement>> dataElementMap = JSON.parseObject(itemJson,
-                        new TypeReference<Map<String, List<DataElement>>>() {});
+//                // 根据itemId获取业务库中有哪些字段
+//                String itemJson = HttpClientUtil.getInstance().sendHttpGet(5000,
+//                        dataManageAddress + "/catalog/item/elements/" + itemId);
+//                Map<String, List<DataElement>> dataElementMap = JSON.parseObject(itemJson,
+//                        new TypeReference<Map<String, List<DataElement>>>() {});
+//
+//                System.out.println("dataElementMap: " + JSON.toJSONString(dataElementMap));
+//
+//                // 根据itemId获取业务库信息
+//                String containerJson = HttpClientUtil.getInstance().sendHttpGet(5000,
+//                        dataManageAddress + "/catalog/item/containers/" + itemId);
+//                List<DataContainer> dataContainerList = JSON.parseObject(containerJson,
+//                        new TypeReference<List<DataContainer>>() {});
+//
+//                List<DataElement> dataElementList = dataElementMap.get(dataContainerList.get(0).getDbName());
 
-                System.out.println("dataElementMap: " + JSON.toJSONString(dataElementMap));
-
-                // 根据itemId获取业务库信息
-                String containerJson = HttpClientUtil.getInstance().sendHttpGet(5000,
-                        dataManageAddress + "/catalog/item/containers/" + itemId);
-                List<DataContainer> dataContainerList = JSON.parseObject(containerJson,
-                        new TypeReference<List<DataContainer>>() {});
-
-                System.out.println("containerJson: " + JSON.toJSONString(containerJson));
-
-                List<DataElement> dataElementList = dataElementMap.get(dataContainerList.get(0).getDbName());
+                // 用户按顺序选择的、需要存储到数据库的数据元(字段)有序列表
+                ArrayList<String> orderedElementList = JSONObject.parseObject(orderedElements, new TypeReference<ArrayList<String>>(){});
+                System.out.println("==============");
+                System.out.println("orderedElementList: " + orderedElementList);
+                System.out.println("==============");
 
                 // 手动构建数据容器需要的JSON
                 List<String> appendList = new ArrayList<>();
-                for (DataElement item : dataElementList) {
-                    appendList.add("\"" + FieldUtil.underlineToCamel(item.getFieldName()) + "\":"); // 格式 "testAddtime":
+                for (String item : orderedElementList) {
+                    appendList.add("\"" + FieldUtil.underlineToCamel(item) + "\":"); // 格式 "testAddtime":
                 }
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append("[");
@@ -217,16 +224,12 @@ public class PrestoJobHandler extends IJobHandler{
                 System.out.println(JSON.toJSONString(itemDetail));
                 String dataKey = itemDetail.getDataKey();
 
-                System.out.println("dataKey: " + dataKey);
-                System.out.println("stringBuilder: " + stringBuilder.toString());
-
                 String topic = null;
                 try {
                     topic = crudAccessService.batchCreate(dataKey, stringBuilder.toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println("topic: " + topic);
 
                 DataAccessBackResult dataAccessBackResult = JSON.parseObject(topic, DataAccessBackResult.class);
                 System.out.println("===========");
@@ -248,14 +251,8 @@ public class PrestoJobHandler extends IJobHandler{
         PrestoResults result = JSON.parseObject(resultJson, new TypeReference<PrestoResults>() {
         });
 
-        System.out.println("save2db: " + save2db);
         if (save2db == 1) { // 如果需要定时存储查询结果到数据库
-            batchCreateCallable batchCreateCallable = new batchCreateCallable(resultJson, itemId, dataManageAddress);
-            System.out.println("---------------------------------");
-            System.out.println("resultJson: " + resultJson);
-            System.out.println("itemId: " + itemId);
-            System.out.println("dataManageAddress: " + dataManageAddress);
-            System.out.println("---------------------------------");
+            batchCreateCallable batchCreateCallable = new batchCreateCallable(resultJson, itemId, dataManageAddress, orderedElements);
             FutureTask<String> futureTask = new FutureTask<String>(batchCreateCallable);
             new Thread(futureTask).start();
         }

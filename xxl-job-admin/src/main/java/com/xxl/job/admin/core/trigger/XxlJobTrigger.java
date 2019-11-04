@@ -1,5 +1,6 @@
 package com.xxl.job.admin.core.trigger;
 
+import com.alibaba.fastjson.JSON;
 import com.xxl.job.admin.core.enums.ExecutorFailStrategyEnum;
 import com.xxl.job.admin.core.model.XxlJobGroup;
 import com.xxl.job.admin.core.model.XxlJobInfo;
@@ -12,7 +13,6 @@ import com.xxl.job.admin.core.util.I18nUtil;
 import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.biz.model.TriggerParam;
-import com.xxl.job.core.entity.presto.PrestoParam;
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.util.DateTool;
 import com.xxl.job.core.util.IpUtil;
@@ -162,23 +162,7 @@ public class XxlJobTrigger {
                     }
                     // [supcon]设置Presto参数
                     if (jobInfo.getPrestoParam() != null) {
-                        triggerParam.setPrestoParam(jobInfo.getPrestoParam());
-                    }
-                    if (jobInfo.getPrestoParam() == null) {
-                        PrestoParam prestoParam = new PrestoParam();
-                        prestoParam.setYanagishimaAddress("10.10.77.109:9083");
-                        prestoParam.setDataSource("your-presto");
-                        prestoParam.setPrestoDbDriver("com.mysql.jdbc.Driver");
-                        prestoParam.setPrestoDbJdbcUrl("jdbc:mysql://10.10.77.138:3306/presto?autoReconnect=true");
-                        prestoParam.setPrestoDbUsername("root");
-                        prestoParam.setPrestoDbPassword("supconit");
-                        prestoParam.setJobId(1);
-                        prestoParam.setQuery("SELECT * FROM oracle.dc.\"notebook\" LIMIT 100");
-                        prestoParam.setTitle("testTitle");
-                        prestoParam.setSave2db(1);
-                        prestoParam.setItemId(Long.valueOf(4761));
-                        prestoParam.setDataManageAddress("http://10.10.77.135:8090/data_manage_web");
-                        triggerParam.setPrestoParam(prestoParam);
+                        triggerParam.setPrestoParam(JSON.toJSONString(jobInfo.getPrestoParam()));
                     }
 
                     // 4.2、trigger-run (route run / trigger remote executor)
@@ -285,22 +269,6 @@ public class XxlJobTrigger {
                 // [supcon]设置Presto参数
                 if (jobInfo.getPrestoParam() != null) {
                     triggerParam.setPrestoParam(jobInfo.getPrestoParam());
-                }
-                if (jobInfo.getPrestoParam() == null) {
-                    PrestoParam prestoParam = new PrestoParam();
-                    prestoParam.setYanagishimaAddress("10.10.77.109:9083");
-                    prestoParam.setDataSource("your-presto");
-                    prestoParam.setPrestoDbDriver("com.mysql.jdbc.Driver");
-                    prestoParam.setPrestoDbJdbcUrl("jdbc:mysql://10.10.77.138:3306/presto?autoReconnect=true");
-                    prestoParam.setPrestoDbUsername("root");
-                    prestoParam.setPrestoDbPassword("supconit");
-                    prestoParam.setJobId(1);
-                    prestoParam.setQuery("SELECT * FROM oracle.dc.\"notebook\" LIMIT 100");
-                    prestoParam.setTitle("testTitle");
-                    prestoParam.setSave2db(1);
-                    prestoParam.setItemId(Long.valueOf(4761));
-                    prestoParam.setDataManageAddress("http://10.10.77.135:8090/data_manage_web");
-                    triggerParam.setPrestoParam(prestoParam);
                 }
 
                 // 4.2、trigger-run (route run / trigger remote executor) 触发调度

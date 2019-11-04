@@ -31,7 +31,7 @@ public class TriggerParam implements Serializable{
     private String customParam;
     private Map<String, byte[]> resources;
 
-    private PrestoParam prestoParam;
+    private String prestoParam;
 
     public int getJobId() {
         return jobId;
@@ -137,11 +137,11 @@ public class TriggerParam implements Serializable{
         this.customParam = customParam;
     }
 
-    public PrestoParam getPrestoParam() {
+    public String getPrestoParam() {
         return prestoParam;
     }
 
-    public void setPrestoParam(PrestoParam prestoParam) {
+    public void setPrestoParam(String prestoParam) {
         this.prestoParam = prestoParam;
     }
 

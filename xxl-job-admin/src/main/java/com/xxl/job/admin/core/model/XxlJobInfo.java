@@ -66,7 +66,7 @@ public class XxlJobInfo {
 	/** 自定义参数，可能多个，格式为{"param1":"1","param2":"2"}，需要转化为JSONObject **/
 	private String customParam;
 
-	private PrestoParam prestoParam;
+	private String prestoParam;
 
 	public String getCustomParam() {
 		return customParam;
@@ -260,11 +260,11 @@ public class XxlJobInfo {
 		this.folderId = folderId;
 	}
 
-	public PrestoParam getPrestoParam() {
+	public String getPrestoParam() {
 		return prestoParam;
 	}
 
-	public void setPrestoParam(PrestoParam prestoParam) {
+	public void setPrestoParam(String prestoParam) {
 		this.prestoParam = prestoParam;
 	}
 }

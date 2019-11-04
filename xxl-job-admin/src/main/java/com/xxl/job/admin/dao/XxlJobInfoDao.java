@@ -1,7 +1,6 @@
 package com.xxl.job.admin.dao;
 
 import com.xxl.job.admin.core.model.XxlJobInfo;
-import com.xxl.job.admin.core.schedule.XxlJobDynamicScheduler;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

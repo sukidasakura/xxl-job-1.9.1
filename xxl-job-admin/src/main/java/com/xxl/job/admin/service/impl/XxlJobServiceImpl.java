@@ -340,6 +340,7 @@ public class XxlJobServiceImpl implements XxlJobService {
         exists_jobInfo.setCustomParam(jobInfo.getCustomParam());
         exists_jobInfo.setResourceId(jobInfo.getResourceId());
         exists_jobInfo.setGlueType(jobInfo.getGlueType().toUpperCase());
+        exists_jobInfo.setPrestoParam(jobInfo.getPrestoParam());
         xxlJobInfoDao.update(exists_jobInfo);
 
         // fresh quartz
