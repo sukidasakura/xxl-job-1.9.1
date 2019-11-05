@@ -19,7 +19,8 @@ public class PrestoParam implements Serializable{
     private String title;
     private String query;
     private int save2db; // 是否将查询结果定时存储到数据库
-    private Long itemId; // 数据容器接口需要的ID
+    private Long itemId; // 数据项ID
+    private String containerId; // 数据容器ID
     private String dataManageAddress;
     private String orderedElements; // 需要存储到数据库的数据元(字段)有序列表
 
@@ -125,5 +126,13 @@ public class PrestoParam implements Serializable{
 
     public void setOrderedElements(String orderedElements) {
         this.orderedElements = orderedElements;
+    }
+
+    public String getContainerId() {
+        return containerId;
+    }
+
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
     }
 }

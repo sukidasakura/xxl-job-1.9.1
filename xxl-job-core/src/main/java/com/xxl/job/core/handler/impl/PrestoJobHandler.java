@@ -3,7 +3,7 @@ package com.xxl.job.core.handler.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.supconit.data.crud.services.CrudAccessService;
+import com.supconit.data.asset.crud.services.CrudAccessService;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.entity.presto.PrestoParam;
 import com.xxl.job.core.entity.presto.PrestoResults;
@@ -14,6 +14,8 @@ import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import com.xxl.job.core.util.FieldUtil;
 import com.xxl.job.core.util.HttpClientUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
@@ -37,6 +39,8 @@ import java.util.concurrent.FutureTask;
 @Service
 public class PrestoJobHandler extends IJobHandler{
 
+    private Logger logger = LoggerFactory.getLogger(PrestoJobHandler.class);
+
     private CrudAccessService crudAccessService;
 
     private String glueUpdatetime;
@@ -52,6 +56,7 @@ public class PrestoJobHandler extends IJobHandler{
 
     private int save2db; // 是否将查询结果定时存储到数据库
     private Long itemId; // 数据容器接口需要的ID
+    private String containerId;
     private String orderedElements; // 需要存储到数据库的数据元(字段)有序列表
 
     public PrestoJobHandler() {
@@ -59,7 +64,6 @@ public class PrestoJobHandler extends IJobHandler{
 
     public PrestoJobHandler(String glueUpdatetime,
                      String prestoParam1, CrudAccessService crudAccessService){
-        System.out.println("PrestoJobHandler PrestoParam: " + prestoParam1);
         PrestoParam prestoParam = JSONObject.parseObject(prestoParam1, new TypeReference<PrestoParam>(){});
         this.glueUpdatetime = glueUpdatetime;
         this.prestoAPI = "http://" + prestoParam.getYanagishimaAddress();
@@ -69,6 +73,7 @@ public class PrestoJobHandler extends IJobHandler{
         this.query = prestoParam.getQuery();
         this.save2db = prestoParam.getSave2db();
         this.itemId = prestoParam.getItemId();
+        this.containerId = prestoParam.getContainerId();
         this.dataManageAddress = prestoParam.getDataManageAddress();
         this.crudAccessService = crudAccessService;
         this.orderedElements = prestoParam.getOrderedElements();
@@ -171,27 +176,9 @@ public class PrestoJobHandler extends IJobHandler{
             if (prestoResults.getError() == null) { // 运行结果正确
                 String[][] results = prestoResults.getResults();
 
-//                // 根据itemId获取业务库中有哪些字段
-//                String itemJson = HttpClientUtil.getInstance().sendHttpGet(5000,
-//                        dataManageAddress + "/catalog/item/elements/" + itemId);
-//                Map<String, List<DataElement>> dataElementMap = JSON.parseObject(itemJson,
-//                        new TypeReference<Map<String, List<DataElement>>>() {});
-//
-//                System.out.println("dataElementMap: " + JSON.toJSONString(dataElementMap));
-//
-//                // 根据itemId获取业务库信息
-//                String containerJson = HttpClientUtil.getInstance().sendHttpGet(5000,
-//                        dataManageAddress + "/catalog/item/containers/" + itemId);
-//                List<DataContainer> dataContainerList = JSON.parseObject(containerJson,
-//                        new TypeReference<List<DataContainer>>() {});
-//
-//                List<DataElement> dataElementList = dataElementMap.get(dataContainerList.get(0).getDbName());
-
                 // 用户按顺序选择的、需要存储到数据库的数据元(字段)有序列表
                 ArrayList<String> orderedElementList = JSONObject.parseObject(orderedElements, new TypeReference<ArrayList<String>>(){});
-                System.out.println("==============");
-                System.out.println("orderedElementList: " + orderedElementList);
-                System.out.println("==============");
+                logger.info("orderedElementList: " + orderedElementList);
 
                 // 手动构建数据容器需要的JSON
                 List<String> appendList = new ArrayList<>();
@@ -226,15 +213,13 @@ public class PrestoJobHandler extends IJobHandler{
 
                 String topic = null;
                 try {
-                    topic = crudAccessService.batchCreate(dataKey, stringBuilder.toString());
+                    topic = crudAccessService.batchCreate(dataKey, containerId, stringBuilder.toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
                 DataAccessBackResult dataAccessBackResult = JSON.parseObject(topic, DataAccessBackResult.class);
-                System.out.println("===========");
-                System.out.println(JSON.toJSONString(dataAccessBackResult));
-                System.out.println("===========");
+                logger.info("dataAccessBackResult: " + dataAccessBackResult);
                 return "0";
             } else {
                 return "1"; // exit code: 0=success, 1=error

@@ -2,7 +2,8 @@ package com.xxl.job.core.biz.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.supconit.data.crud.services.CrudAccessService;
+//import com.supconit.data.crud.services.CrudAccessService;
+import com.supconit.data.asset.crud.services.CrudAccessService;
 import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.biz.model.LogResult;
 import com.xxl.job.core.biz.model.ReturnT;

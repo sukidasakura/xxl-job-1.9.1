@@ -164,6 +164,23 @@ public class XxlJobTrigger {
                     if (jobInfo.getPrestoParam() != null) {
                         triggerParam.setPrestoParam(JSON.toJSONString(jobInfo.getPrestoParam()));
                     }
+//                    if (jobInfo.getPrestoParam() == null) {
+//                        PrestoParam prestoParam = new PrestoParam();
+//                        prestoParam.setYanagishimaAddress("10.10.77.109:9083");
+//                        prestoParam.setDataSource("your-presto");
+//                        prestoParam.setPrestoDbDriver("com.mysql.jdbc.Driver");
+//                        prestoParam.setPrestoDbJdbcUrl("jdbc:mysql://10.10.77.138:3306/presto?autoReconnect=true");
+//                        prestoParam.setPrestoDbUsername("root");
+//                        prestoParam.setPrestoDbPassword("supconit");
+//                        prestoParam.setJobId(1);
+//                        prestoParam.setQuery("SELECT * FROM oracle.dc.\"notebook\" LIMIT 100");
+//                        prestoParam.setTitle("testTitle");
+//                        prestoParam.setSave2db(1);
+//                        prestoParam.setItemId(Long.valueOf(4761));
+//                        prestoParam.setContainerId(String.valueOf(763));
+//                        prestoParam.setDataManageAddress("http://10.10.77.135:8090/data_manage_web");
+//                        triggerParam.setPrestoParam(JSON.toJSONString(prestoParam));
+//                    }
 
                     // 4.2、trigger-run (route run / trigger remote executor)
                     // 根据参数以及机器地址，向执行器发送执行信息，需要详细了解runExecutor这个方法
@@ -270,6 +287,23 @@ public class XxlJobTrigger {
                 if (jobInfo.getPrestoParam() != null) {
                     triggerParam.setPrestoParam(jobInfo.getPrestoParam());
                 }
+//                if (jobInfo.getPrestoParam() == null) {
+//                    PrestoParam prestoParam = new PrestoParam();
+//                    prestoParam.setYanagishimaAddress("10.10.77.109:9083");
+//                    prestoParam.setDataSource("your-presto");
+//                    prestoParam.setPrestoDbDriver("com.mysql.jdbc.Driver");
+//                    prestoParam.setPrestoDbJdbcUrl("jdbc:mysql://10.10.77.138:3306/presto?autoReconnect=true");
+//                    prestoParam.setPrestoDbUsername("root");
+//                    prestoParam.setPrestoDbPassword("supconit");
+//                    prestoParam.setJobId(1);
+//                    prestoParam.setQuery("SELECT * FROM oracle.dc.\"notebook\" LIMIT 100");
+//                    prestoParam.setTitle("testTitle");
+//                    prestoParam.setSave2db(1);
+//                    prestoParam.setItemId(Long.valueOf(4761));
+//                    prestoParam.setContainerId(String.valueOf(763));
+//                    prestoParam.setDataManageAddress("http://10.10.77.135:8090/data_manage_web");
+//                    triggerParam.setPrestoParam(JSON.toJSONString(prestoParam));
+//                }
 
                 // 4.2、trigger-run (route run / trigger remote executor) 触发调度
                 // 此处用了策略模式，根据不同的策略，使用不同的实现类

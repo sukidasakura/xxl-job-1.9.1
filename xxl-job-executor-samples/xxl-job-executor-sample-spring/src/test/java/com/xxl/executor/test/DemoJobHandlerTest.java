@@ -2,19 +2,11 @@ package com.xxl.executor.test;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.supconit.data.crud.services.CrudAccessService;
-import com.xxl.job.core.biz.ExecutorBiz;
-import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.biz.model.TriggerParam;
-import com.xxl.job.core.entity.presto.PrestoResults;
+import com.supconit.data.asset.crud.services.CrudAccessService;
 import com.xxl.job.core.entity.presto.catalog.DataAccessBackResult;
 import com.xxl.job.core.entity.presto.catalog.DataContainer;
 import com.xxl.job.core.entity.presto.catalog.DataElement;
 import com.xxl.job.core.entity.presto.catalog.DataItem;
-import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
-import com.xxl.job.core.glue.GlueTypeEnum;
-import com.xxl.job.core.handler.impl.PrestoJobHandler;
-import com.xxl.job.core.rpc.netcom.NetComClientProxy;
 import com.xxl.job.core.util.FieldUtil;
 import com.xxl.job.core.util.HttpClientUtil;
 import org.junit.Test;
@@ -101,7 +93,7 @@ public class DemoJobHandlerTest {
         System.out.println("dataKey: " + dataKey);
         System.out.println("stringBuilder: " + stringBuilder.toString());
 
-        String topic = crudAccessService.batchCreate(dataKey, stringBuilder.toString());
+        String topic = crudAccessService.batchCreate(dataKey, "763", stringBuilder.toString());
         System.out.println("===========");
         System.out.println("topic: " + topic);
         System.out.println("===========");

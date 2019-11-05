@@ -73,12 +73,19 @@
         </dependency>
 
         <!--supcon crud-->
+        <!--<dependency>-->
+            <!--<groupId>com.supconit.data</groupId>-->
+            <!--<artifactId>data_crud_impl</artifactId>-->
+            <!--<version>${data.center.version}</version>-->
+            <!--<scope>system</scope>-->
+            <!--<systemPath>${project.basedir}/lib/data_crud_impl-1.2.00.180701-SNAPSHOT.jar</systemPath>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.supconit.data</groupId>
-            <artifactId>data_crud_impl</artifactId>
+            <artifactId>data_asset_crud</artifactId>
             <version>${data.center.version}</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/data_crud_impl-1.2.00.180701-SNAPSHOT.jar</systemPath>
+            <systemPath>${project.basedir}/lib/data_asset_crud-1.2.00.180701-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.supconit.data</groupId>
@@ -122,6 +129,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.2.2</version>
         </dependency>
     </dependencies>
 

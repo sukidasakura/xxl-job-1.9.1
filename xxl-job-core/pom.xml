@@ -98,12 +98,19 @@
             <version>1.2.4</version>
         </dependency>
 
+        <!--<dependency>-->
+            <!--<groupId>com.supconit.data</groupId>-->
+            <!--<artifactId>data_crud_api</artifactId>-->
+            <!--<version>${data.center.version}</version>-->
+            <!--<scope>system</scope>-->
+            <!--<systemPath>${project.basedir}/lib/data_crud_api-1.2.00.180701-SNAPSHOT.jar</systemPath>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.supconit.data</groupId>
-            <artifactId>data_crud_api</artifactId>
+            <artifactId>data_asset_crud</artifactId>
             <version>${data.center.version}</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/data_crud_api-1.2.00.180701-SNAPSHOT.jar</systemPath>
+            <systemPath>${project.basedir}/lib/data_asset_crud-1.2.00.180701-SNAPSHOT.jar</systemPath>
         </dependency>
 
         <!--spring-->
