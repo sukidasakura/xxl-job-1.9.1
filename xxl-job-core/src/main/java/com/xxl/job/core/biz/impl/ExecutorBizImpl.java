@@ -2,7 +2,6 @@ package com.xxl.job.core.biz.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-//import com.supconit.data.crud.services.CrudAccessService;
 import com.supconit.data.asset.crud.services.CrudAccessService;
 import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.biz.model.LogResult;
@@ -174,7 +173,7 @@ public class ExecutorBizImpl implements ExecutorBiz {
                     String killScriptContent = "echo \"kill start.\"\n" +
                             "pid=`ps x | grep \"" + jarExecuteString + "\" | awk '{print $1}'`\n" +
                             "kill $pid\n";
-                    System.out.println(killScriptContent);
+                    logger.info("killScriptContent:" + killScriptContent);
 
                     String logFileName = XxlJobFileAppender.contextHolder.get();
                     try {
@@ -268,10 +267,7 @@ public class ExecutorBizImpl implements ExecutorBiz {
             // valid handler
             if (jobHandler == null) {
                 try {
-                    System.out.println("~~~~~~~~~~~~~~");
-                    System.out.println("triggerParam: " + JSON.toJSONString(triggerParam));
-                    System.out.println("triggerParam.getPrestoParam(): " + JSON.toJSONString(triggerParam.getPrestoParam()));
-                    System.out.println("~~~~~~~~~~~~~~");
+                    XxlJobLogger.log("triggerParam: " + JSON.toJSONString(triggerParam));
                     jobHandler = new PrestoJobHandler(triggerParam.getGlueUpdatetime(),
                             triggerParam.getPrestoParam(), crudAccessService);
                 } catch (Exception e) {

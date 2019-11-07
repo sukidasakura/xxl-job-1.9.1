@@ -73,13 +73,6 @@
         </dependency>
 
         <!--supcon crud-->
-        <!--<dependency>-->
-            <!--<groupId>com.supconit.data</groupId>-->
-            <!--<artifactId>data_crud_impl</artifactId>-->
-            <!--<version>${data.center.version}</version>-->
-            <!--<scope>system</scope>-->
-            <!--<systemPath>${project.basedir}/lib/data_crud_impl-1.2.00.180701-SNAPSHOT.jar</systemPath>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.supconit.data</groupId>
             <artifactId>data_asset_crud</artifactId>

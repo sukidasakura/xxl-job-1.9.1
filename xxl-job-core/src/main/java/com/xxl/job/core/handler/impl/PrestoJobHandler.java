@@ -39,8 +39,6 @@ import java.util.concurrent.FutureTask;
 @Service
 public class PrestoJobHandler extends IJobHandler{
 
-    private Logger logger = LoggerFactory.getLogger(PrestoJobHandler.class);
-
     private CrudAccessService crudAccessService;
 
     private String glueUpdatetime;
@@ -136,7 +134,9 @@ public class PrestoJobHandler extends IJobHandler{
             String queryStatusParam = "datasource=" + datasource + "&queryid=" + queryId;
             QueryStatus queryStatus;
             do {
+                XxlJobLogger.log("sql执行中...");
                 String queryStatusJson = HttpClientUtil.getInstance().sendHttpPost(queryStatusUrl, queryStatusParam);
+                XxlJobLogger.log("<br> [ queryStatusJson: " + queryStatusJson + "  ] <br>");
                 queryStatus = JSON.parseObject(queryStatusJson, new TypeReference<QueryStatus>() {});
                 try {
                     Thread.sleep(1000);
@@ -144,7 +144,7 @@ public class PrestoJobHandler extends IJobHandler{
                     e.printStackTrace();
                 }
             } while (queryStatus.getState().equals("PLANNING"));
-
+            XxlJobLogger.log("sql执行完成...");
 
             return saveLogToDatabase(id, title, queryId, save2db, itemId);
         }
@@ -178,7 +178,7 @@ public class PrestoJobHandler extends IJobHandler{
 
                 // 用户按顺序选择的、需要存储到数据库的数据元(字段)有序列表
                 ArrayList<String> orderedElementList = JSONObject.parseObject(orderedElements, new TypeReference<ArrayList<String>>(){});
-                logger.info("orderedElementList: " + orderedElementList);
+                XxlJobLogger.log("<br> [ orderedElementList: " + JSON.toJSONString(orderedElementList) + "  ] <br>");
 
                 // 手动构建数据容器需要的JSON
                 List<String> appendList = new ArrayList<>();
@@ -208,7 +208,6 @@ public class PrestoJobHandler extends IJobHandler{
                 DataItem itemDetail = JSON.parseObject(itemDetailJson,
                         new TypeReference<DataItem>() {});
 
-                System.out.println(JSON.toJSONString(itemDetail));
                 String dataKey = itemDetail.getDataKey();
 
                 String topic = null;
@@ -219,7 +218,7 @@ public class PrestoJobHandler extends IJobHandler{
                 }
 
                 DataAccessBackResult dataAccessBackResult = JSON.parseObject(topic, DataAccessBackResult.class);
-                logger.info("dataAccessBackResult: " + dataAccessBackResult);
+                XxlJobLogger.log("<br> [ dataAccessBackResult: " + JSON.toJSONString(dataAccessBackResult) + "  ] <br>");
                 return "0";
             } else {
                 return "1"; // exit code: 0=success, 1=error
@@ -237,11 +236,13 @@ public class PrestoJobHandler extends IJobHandler{
         });
 
         if (save2db == 1) { // 如果需要定时存储查询结果到数据库
+            XxlJobLogger.log("开始存储sql执行结果到数据库...");
             batchCreateCallable batchCreateCallable = new batchCreateCallable(resultJson, itemId, dataManageAddress, orderedElements);
             FutureTask<String> futureTask = new FutureTask<String>(batchCreateCallable);
             new Thread(futureTask).start();
         }
 
+        XxlJobLogger.log("把运行日志加入到数据库日志表中...");
         // 运行后需要把运行日志加入到数据库log_info表中
         result.setQueryid(queryId);
         try {
