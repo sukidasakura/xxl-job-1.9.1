@@ -18,7 +18,7 @@ public interface XxlJobRegistryDao {
                        @Param("registryKey") String registryKey,
                        @Param("registryValue") String registryValue);
 
-    int registrySave(@Param("id") int id,
+    int registrySave(
                      @Param("registryGroup") String registryGroup,
                      @Param("registryKey") String registryKey,
                      @Param("registryValue") String registryValue,

@@ -25,8 +25,9 @@ public class XxlJobInfoDaoTest {
     @Test
     public void pageList1() {
 
-        System.out.println(xxlJobInfoDao.allJobList());
-
+        System.out.println("=========================");
+        System.out.println(JSON.toJSONString(xxlJobInfoDao.loadByName("asaddaa")));
+        System.out.println("=========================");
 
 //		List<XxlJobInfo> list = xxlJobInfoDao.pageList(0, 20, 0, null, null);
 //		int list_count = xxlJobInfoDao.pageListCount(0, 20, 0, null, null);
@@ -42,7 +43,7 @@ public class XxlJobInfoDaoTest {
         XxlJobInfo info = new XxlJobInfo();
         info.setJobGroup(1);
         info.setJobCron("jobCron");
-        info.setJobName("jobName");
+        info.setJobName("asaddaasda");
         info.setJobDesc("desc");
         info.setAuthor("setAuthor");
         info.setAlarmEmail("setAlarmEmail");
@@ -56,11 +57,11 @@ public class XxlJobInfoDaoTest {
         info.setGlueRemark("setGlueRemark");
         info.setChildJobId("1");
         try {
-            int id = xxlJobInfoDao.findMaxId();
-            System.out.println("===========");
-            System.out.println(id);
-            System.out.println("===========");
-            info.setId(id + 1);
+//            int id = xxlJobInfoDao.findMaxId();
+//            System.out.println("===========");
+//            System.out.println(id);
+//            System.out.println("===========");
+//            info.setId(id + 1);
             xxlJobInfoDao.save(info);
             if (info.getId() < 1) { // 新增任务失败
                 System.out.println("失败");
@@ -178,8 +179,8 @@ public class XxlJobInfoDaoTest {
     @Test
     public void loadByNameTest() {
         System.out.println("==========");
-        XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadByName("test_deletehisfiles1111");
-        System.out.println(JSON.toJSONString(xxlJobInfo));
+//        XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadByName("test_deletehisfiles1111");
+//        System.out.println(JSON.toJSONString(xxlJobInfo));
         System.out.println("=====");
     }
 

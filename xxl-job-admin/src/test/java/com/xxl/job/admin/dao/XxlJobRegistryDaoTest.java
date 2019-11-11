@@ -22,7 +22,7 @@ public class XxlJobRegistryDaoTest {
     public void test(){
         int ret = xxlJobRegistryDao.registryUpdate("g1", "k1", "v1");
         if (ret < 1) {
-            ret = xxlJobRegistryDao.registrySave(1,"g1", "k1", "v1", DateTool.convertDateTime(new Date()));
+            ret = xxlJobRegistryDao.registrySave("g1", "k1", "v1", DateTool.convertDateTime(new Date()));
         }
 
         List<XxlJobRegistry> list = xxlJobRegistryDao.findAll(1);

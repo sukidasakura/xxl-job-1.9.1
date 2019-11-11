@@ -40,8 +40,6 @@ public class AdminBizImpl implements AdminBiz {
     @Resource
     private XxlJobService xxlJobService;
 
-    private static ReentrantLock lock = new ReentrantLock();
-
 
     @Override
     public ReturnT<String> callback(List<HandleCallbackParam> callbackParamList) {
@@ -127,14 +125,9 @@ public class AdminBizImpl implements AdminBiz {
         int ret = xxlJobRegistryDao.registryUpdate(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
         if (ret < 1) {
             try {
-                lock.lock();
-                int id = xxlJobRegistryDao.findMaxId();
-                xxlJobRegistryDao.registrySave(id + 1, registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue(), DateTool.convertDateTime(new Date()));
-
+                xxlJobRegistryDao.registrySave(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue(), DateTool.convertDateTime(new Date()));
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                lock.unlock();
             }
         }
         return ReturnT.SUCCESS;

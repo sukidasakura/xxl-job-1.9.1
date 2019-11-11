@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * xxl-job trigger
@@ -38,7 +37,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class XxlJobTrigger {
     private static Logger logger = LoggerFactory.getLogger(XxlJobTrigger.class);
-    private static ReentrantLock lock = new ReentrantLock();
 
     /**
      * trigger job
@@ -92,14 +90,9 @@ public class XxlJobTrigger {
                 jobLog.setJobId(jobInfo.getId());
 
                 try {
-                    lock.lock();
-                    int id = XxlJobDynamicScheduler.xxlJobLogDao.findMaxId();
-                    jobLog.setId(id + 1);
                     XxlJobDynamicScheduler.xxlJobLogDao.save(jobLog);
                 } catch (Exception e) {
                     e.printStackTrace();
-                } finally {
-                    lock.unlock();
                 }
 
                 logger.debug(">>>>>>>>>>> xxl-job trigger start, jobId:{}", jobLog.getId());
@@ -215,14 +208,9 @@ public class XxlJobTrigger {
             jobLog.setJobId(jobInfo.getId());
 
             try {
-                lock.lock();
-                int id = XxlJobDynamicScheduler.xxlJobLogDao.findMaxId();
-                jobLog.setId(id + 1);
                 XxlJobDynamicScheduler.xxlJobLogDao.save(jobLog);
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                lock.unlock();
             }
 
             logger.debug(">>>>>>>>>>> xxl-job trigger start, jobId:{}", jobLog.getId());

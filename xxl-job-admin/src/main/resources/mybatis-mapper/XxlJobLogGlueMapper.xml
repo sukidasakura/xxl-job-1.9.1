@@ -25,7 +25,6 @@
 	
 	<insert id="save" parameterType="com.xxl.job.admin.core.model.XxlJobLogGlue" useGeneratedKeys="true" keyProperty="id" >
 		INSERT INTO XXL_JOB_QRTZ_TRIGGER_LOGGLUE (
-			`id`,
 			`job_id`,
 			`glue_type`,
 			`glue_source`,
@@ -33,7 +32,6 @@
 			`add_time`, 
 			`update_time`
 		) VALUES (
-			#{id},
 			#{jobId},
 			#{glueType},
 			#{glueSource},

@@ -809,6 +809,9 @@ public class XxlJobServiceImpl implements XxlJobService {
         if (group == null) { //请选择执行器
             return new ReturnT<String>(ReturnT.FAIL_CODE, (I18nUtil.getString("system_please_choose") + I18nUtil.getString("jobinfo_field_jobgroup")));
         }
+        if (xxlJobInfoDao.loadByName(jobInfo.getJobDesc()) != null) {
+            return new ReturnT<>(500, "任务名已存在");
+        }
         if (StringUtils.isBlank(jobInfo.getJobName())) {
             if (StringUtils.isBlank(jobInfo.getJobDesc())) {
                 return new ReturnT<String>(ReturnT.FAIL_CODE, (I18nUtil.getString("system_please_input") + I18nUtil.getString("jobinfo_field_jobdesc")));

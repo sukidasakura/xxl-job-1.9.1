@@ -32,8 +32,6 @@ public class JobCodeController {
     @Resource
     private XxlJobLogGlueDao xxlJobLogGlueDao;
 
-    private static ReentrantLock lock = new ReentrantLock();
-
     @RequestMapping
     public String index(Model model, int jobId) {
         XxlJobInfo jobInfo = xxlJobInfoDao.loadById(jobId);
@@ -82,14 +80,9 @@ public class JobCodeController {
         xxlJobLogGlue.setGlueSource(glueSource);
         xxlJobLogGlue.setGlueRemark(glueRemark);
         try {
-            lock.lock();
-            int maxId = xxlJobLogGlueDao.findMaxId();
-            xxlJobLogGlue.setId(maxId + 1);
             xxlJobLogGlueDao.save(xxlJobLogGlue);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            lock.unlock();
         }
 
         // remove code backup more than 30

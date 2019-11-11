@@ -34,8 +34,6 @@ public class JobResourceController {
     @Resource
     public XxlJobInfoDao xxlJobInfoDao;
 
-    private static ReentrantLock lock = new ReentrantLock();
-
     /**
      * 列出所有资源
      *
@@ -108,16 +106,11 @@ public class JobResourceController {
 
         int result = 0;
         try {
-            lock.lock();
-            int id = xxlJobResourceDao.findMaxId();
-            xxlJobResource.setId(id + 1);
             result = xxlJobResourceDao.upload(xxlJobResource);
         } catch (Exception e) {
             returnT.setCode(ReturnT.FAIL_CODE);
             returnT.setMessage("新增失败：" + e.getMessage());
             return returnT;
-        } finally {
-            lock.unlock();
         }
 
 
